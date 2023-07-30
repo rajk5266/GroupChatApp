@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express')
 const path = require('path');
 const bodyParser = require('body-parser')
+const sequelize = require('./util/database')
 const cors = require('cors')
 const app = express();
 
@@ -15,6 +17,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', signup)
 
 
-app.listen(5000, () => {
-    console.log('Server is running');
-  });
+sequelize
+    .sync()
+    .then(result => {
+        console.log('database connected')
+        app.listen(process.env.PORT || 5000)
+    })
+    .catch(err => console.log(err))
