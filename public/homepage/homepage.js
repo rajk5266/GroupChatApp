@@ -7,7 +7,9 @@ $(document).ready(function(){
     });
         });
 window.addEventListener('DOMContentLoaded', async () => {
+
     getAllUsers()
+    getAllMessages()
 })
 async function getAllUsers(){
     try{
@@ -23,11 +25,37 @@ async function getAllUsers(){
     }
 }
 
+async function getAllMessages(){
+  try{
+    const messages = await axios.get('http://localhost:5000/getAllMessages', token)
+    const message = messages.data.usersMessages;
+    console.log(message)
+    for(let i=0; i<message.length; i++){
+      showMessages(message[i])
+    }
+  }catch(err){
+    console.log(err)
+  }
+}
+
 async function sendMessage(e){
   e.preventDefault()
+
   const message = document.getElementById('messageInput').value
-  // console.log(message)
-  const messageToSend = await axios.post('http://localhost:5000/messages',{message} , token)
+  const date = new Date()
+  const formattedDate = date.toString().slice(4, 21)
+  const name = localStorage.getItem('name')
+  // console.log(formattedDate)
+  const obj = {
+    // name,
+    message,
+    date: formattedDate,
+    isOwnMessage:true
+  }
+  showMessages(obj)
+  const messageToSend = await axios.post('http://localhost:5000/messages',{message,formattedDate} , token)
+  // console.log(messageToSend)
+  document.getElementById('messageInput').value = ''
 }
 
 function showUsers(name) {
@@ -69,4 +97,41 @@ function showUsers(name) {
     userItem.appendChild(userDiv);
     contacts.appendChild(userItem);
   }
-  
+
+  function showMessages(message) {
+    const parentMessageContainer = document.getElementById('parentMessageContainer');
+
+    const outerDiv = document.createElement('div');
+    outerDiv.classList.add('d-flex', 'justify-content-start', 'mb-4');
+
+    const messageContent = document.createElement('div');
+    // console.log(message.isOwnMessage)
+    const time = document.createElement('span')
+    const name = document.createElement('span')
+    if(message.isOwnMessage === true){
+      messageContent.classList.add('msg_container_own');
+      time.classList.add('own_message_time')
+      // name.classList.add('own_message_name')
+      message.name = ''
+    }
+    else{
+      messageContent.classList.add('msg_container_others')
+    
+    }
+    // console.log(message)
+    name.textContent = message.name
+    messageContent.textContent = message.message ;
+    time.textContent = message.date
+    // messageContent.prepend(document.createElement('br'))
+    // messageContent.prepend(name)
+    // messageContent.appendChild(document.createElement('br'))
+
+    outerDiv.appendChild(messageContent);
+   
+    parentMessageContainer.appendChild(name)
+    parentMessageContainer.appendChild(outerDiv);
+    parentMessageContainer.appendChild(time)
+    parentMessageContainer.appendChild(document.createElement('hr'))
+
+    parentMessageContainer.scrollTop = parentMessageContainer.scrollHeight
+}
