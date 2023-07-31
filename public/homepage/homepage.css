@@ -222,3 +222,8 @@ background-color: rgba(0,0,0,0.2);
 margin-bottom: 15px !important;
 }
 }
+
+.card-body.msg_card_body {
+    height: 400px; /* Set the desired height for the message container */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
