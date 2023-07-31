@@ -10,14 +10,15 @@ app.use(cors())
 
 const signup = require('./routes/signup')
 const login = require('./routes/login')
+const chats = require('./routes/chats')
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json())
-
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', signup)
 app.use('/', login)
+app.use('/', chats)
 
 
 sequelize

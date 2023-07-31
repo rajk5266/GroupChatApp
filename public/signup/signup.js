@@ -9,7 +9,8 @@ async function signup(event) {
         const response = await axios.post('http://localhost:5000/signup', signupdetails)
         console.log(response)
         if (response.status === 200) {
-            alert('user created successfully')
+            alert('registered successfully')
+            window.location.href = "http://localhost:5000"
         }
         console.log(response.data)
     } catch (err) {
