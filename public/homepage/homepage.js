@@ -25,6 +25,12 @@ async function getAllUsers(){
     }
 }
 
+function continueFetching(){
+
+  setInterval(() => {
+    getAllMessages()
+  }, 1000)
+}
 async function getAllMessages(){
   try{
     const messages = await axios.get('http://localhost:5000/getAllMessages', token)
@@ -33,6 +39,7 @@ async function getAllMessages(){
     for(let i=0; i<message.length; i++){
       showMessages(message[i])
     }
+    continueFetching()
   }catch(err){
     console.log(err)
   }
