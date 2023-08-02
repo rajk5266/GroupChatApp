@@ -22,16 +22,20 @@ exports.getAllUsers = async (req, res) => {
 exports.getAllMessages = async (req, res) => {
     try{
         const lastMessageId = req.params.id
-        // console.log("pp", typeof(lastMessageId))
-        console.log(lastMessageId)
-        const messages = await Chats.findAll({
-            where: {
-                id: {
-                    [Sequelize.Op.gt]: lastMessageId
+        let messages;
+
+        if(lastMessageId === undefined){
+             messages = await Chats.findAll()
+        }
+        else{
+             messages = await Chats.findAll({
+                where: {
+                    id: {
+                        [Sequelize.Op.gt]: lastMessageId
+                    }
                 }
-            }
-        })
-         console.log(messages)
+            })
+        }
         const usersMessages = []
         for(let i=0; i<messages.length; i++){
             // console.log(messages[i].dataValues)
