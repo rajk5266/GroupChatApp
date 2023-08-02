@@ -13,7 +13,7 @@ body,html{
 .card{
     height: 500px;
     border-radius: 15px !important;
-    background-color: rgba(6, 93, 207, 0.4) !important;
+    background-color: rgba(6, 46, 102, 0.4) !important;
 }
 .contacts_body{
     padding:  0.75rem 0 !important;
@@ -88,6 +88,16 @@ background-color: rgba(0,0,0,0.3) !important;
 .active{
     background-color: rgba(0,0,0,0.3);
 }
+#group_headbar{
+    background-color:rgb(4, 4, 123);
+    border-radius: 10px;
+}
+#group_headbar_icon{
+    width: 60px;
+    height: 60px;
+    margin-left: 5px;
+    margin-top: 5px;
+}
 .user_img{
     height: 70px;
     width: 70px;
@@ -104,6 +114,7 @@ background-color: rgba(0,0,0,0.3) !important;
     position: relative;
     height: 70px;
     width: 70px;
+    /* padding: 5px; */
 }
 .img_cont_msg{
     height: 40px;
@@ -252,7 +263,7 @@ margin-bottom: 15px !important;
 .input_container button {
     border: none;
     outline: none;
-    background-color: #0fadd1 !important;
+    background-color: #1528fc !important;
     color: #fff;
     font-size: 16px;
     padding: 8px 20px;

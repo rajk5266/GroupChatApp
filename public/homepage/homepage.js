@@ -8,8 +8,18 @@ $(document).ready(function(){
         });
 window.addEventListener('DOMContentLoaded', async () => {
 
+  const storedMsg = localStorage.getItem('messages')
+  if(storedMsg === null){
+      console.log('null')
+      getAllMessages(undefined)
+  }else{
+    const parsedMsg = JSON.parse(storedMsg)
+    const lastMessageId = parsedMsg[parsedMsg.length-1].id
+    console.log(lastMessageId)
+    getAllMessages(lastMessageId)
+  }
     getAllUsers()
-    getAllMessages()
+    // getAllMessages()
 })
 async function getAllUsers(){
     try{
@@ -17,7 +27,6 @@ async function getAllUsers(){
       const names = users.data.names
     //   console.log(users.data.names)
       for(let i=0; i<names.length; i++){
-
           showUsers(names[i])
       }
     }catch(err){
@@ -26,20 +35,30 @@ async function getAllUsers(){
 }
 
 function continueFetching(){
-
   setInterval(() => {
     getAllMessages()
   }, 1000)
 }
-async function getAllMessages(){
+async function getAllMessages(id){
   try{
-    const messages = await axios.get('http://localhost:5000/getAllMessages', token)
-    const message = messages.data.usersMessages;
-    console.log(message)
-    for(let i=0; i<message.length; i++){
-      showMessages(message[i])
+    const messages = await axios.get(`http://localhost:5000/getAllMessages/${id}`, token)
+   
+    const newMessages = messages.data.usersMessages;
+  
+    const storedMessages = localStorage.getItem('messages')
+
+    const parsedMessage = JSON.parse(storedMessages)
+
+    const mergedMessage = parsedMessage.concat(newMessages) 
+
+    const messageLimit = mergedMessage.slice(mergedMessage.length-10)
+
+    localStorage.setItem('messages', JSON.stringify(messageLimit))
+    
+    for(let i=0; i<messageLimit.length; i++){
+      showMessages(messageLimit[i])
     }
-    continueFetching()
+    // continueFetching()
   }catch(err){
     console.log(err)
   }

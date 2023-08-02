@@ -1,6 +1,7 @@
 const path = require('path')
 const Users = require('../models/users')
 const Chats = require('../models/chats')
+const { Sequelize } = require('sequelize')
 
 exports.homePage = (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'homepage', 'homepage.html'))
@@ -20,8 +21,17 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getAllMessages = async (req, res) => {
     try{
-        const messages = await Chats.findAll()
-
+        const lastMessageId = req.params.id
+        // console.log("pp", typeof(lastMessageId))
+        console.log(lastMessageId)
+        const messages = await Chats.findAll({
+            where: {
+                id: {
+                    [Sequelize.Op.gt]: lastMessageId
+                }
+            }
+        })
+         console.log(messages)
         const usersMessages = []
         for(let i=0; i<messages.length; i++){
             // console.log(messages[i].dataValues)
