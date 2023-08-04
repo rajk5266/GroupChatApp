@@ -8,8 +8,8 @@ exports.signUpPage = (req, res) => {
 
 exports.userSignUpDetails = async (req, res) => {
     try {
-        console.log(req.body)
-        const { name, email, password } = req.body;
+        // console.log(req.body)
+        const { username, email, password } = req.body;
         const saltrounds = 10;
         const userExist = await Users.findOne({
             where: { email }
@@ -17,10 +17,18 @@ exports.userSignUpDetails = async (req, res) => {
         if (userExist) {
             return res.status(409).json({ message: "user already exist" })
         }
+        const userName = await Users.findOne({
+            where: {
+                username
+            }
+        })
+        if(userName){
+           return res.status(409).json({message: "username already taken"})
+        }
         bcrypt.hash(password, saltrounds, async (err, hash) => {
             await Users.create({
-                name: name,
-                email: email,
+                username,
+                email,
                 password: hash
             })
             res.status(200).json({ message: "user added succesfully" })

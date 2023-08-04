@@ -8,7 +8,7 @@ const Chat = sequelize.define("chats", {
     autoIncrement: true,
     primaryKey: true,
   },
-  name: {
+  username: {
     type: Sequelize.STRING,
   },
   message: {
@@ -17,6 +17,10 @@ const Chat = sequelize.define("chats", {
   userId:{
     type:Sequelize.INTEGER,
     allowNull: false
+  },
+  groupId: {
+   type: Sequelize.INTEGER,
+   allowNull: false
   },
   date: {
    type: Sequelize.STRING,

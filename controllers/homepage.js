@@ -8,12 +8,10 @@ exports.homePage = (req, res) => {
 }
 
 exports.getAllUsers = async (req, res) => {
-    // console.log(req.user)
     try{
           const users = await Users.findAll()
-          const names = users.map(user => user.dataValues.name);
-        //   console.log( "names", names)
-        res.status(200).json({names: names})
+          const usernames = users.map(user => user.dataValues.username);
+        res.status(200).json({usernames})
     }catch(err){
         console.log(err)
     }
@@ -21,18 +19,25 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getAllMessages = async (req, res) => {
     try{
-        const lastMessageId = req.params.id
+        console.log(req.params)
+        const lastMessageId = req.params.id;
+        const groupId = req.params.groupId;
         let messages;
 
         if(lastMessageId === undefined){
-             messages = await Chats.findAll()
+             messages = await Chats.findAll({
+                where:{
+                    groupId: groupId
+                }
+             })
         }
         else{
              messages = await Chats.findAll({
                 where: {
                     id: {
                         [Sequelize.Op.gt]: lastMessageId
-                    }
+                    },
+                    groupId: groupId
                 }
             })
         }
@@ -59,20 +64,26 @@ exports.getAllMessages = async (req, res) => {
 exports.saveMessages = async (req, res) => {
     try{
         // console.log('req.user',req.user)
-        const {message, formattedDate} = req.body
-        // console.log(message,date)
-        const name = await Users.findOne({
+        console.log(req.body)
+        // const message = req.body.message;
+        // const date = req.body.date;
+        // const isOwnMessage = req.body.isOwnMessage;
+        // const groupId = req.body.groupId
+        const {message,date,groupId} = req.body
+        // console.log(message,"---",date,)
+        const userName = await Users.findOne({
             where:{
                 id: req.user
             }
         })
 
-        const messageOwner = name.dataValues.name
+        const messageOwner = userName.dataValues.username
         const messageToSave = await Chats.create({
-            name: messageOwner,
-            message:message,
+            username: messageOwner,
+            message,
             userId: req.user,
-            date:formattedDate
+            groupId,
+            date
         })
         // console.log(messageToSave)
         res.status(200).json({message: "message saved successfully"})
