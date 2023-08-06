@@ -2,16 +2,25 @@ const path = require('path')
 const Users = require('../models/users')
 const Chats = require('../models/chats')
 const Group = require('../models/groups')
+const GroupUsers = require('../models/group_users')
 const { Sequelize } = require('sequelize')
 
 exports.createGroup = async (req, res) => {
     try{
-        const {groupName} = req.body
+        const {groupName, username} = req.body
         const createGroup = await Group.create({
             groupname: groupName,
-            admin: req.user
+            admin: username
         })
         const groupDetails = createGroup.dataValues
+        const groupId = groupDetails.id
+
+        const groupAdmin = GroupUsers.create({
+            username,
+            groupId,
+            isAdmin: true,
+            // userId: req.user
+        })
         res.status(200).json({groupDetails})
 
     }catch(err){
@@ -22,14 +31,74 @@ exports.createGroup = async (req, res) => {
 
 exports.getAllGroups = async (req, res) => {
     try{
-        const allGroups = await Group.findAll({
+        const {username} = req.params
+        const groupIds = await GroupUsers.findAll({
             where: {
-                admin: req.user
+               username
             }
         })
+        const Ids = groupIds.map(Id => Id.dataValues.groupId)
+        const allGroups = await Group.findAll({
+            where: {
+                id: Ids
+            }
+        })
+        if(!allGroups){
+            return res.status(409).json({message : "no group exist"})
+        }
         const groups = allGroups.map(group => group.dataValues)
-        // console.log(groups)
         res.status(200).json({groups})
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
+exports.searchUser = async (req, res) => {
+    try{
+        const user = req.params.user
+        const userExist = await Users.findOne({
+            where: {
+                username: user
+            }
+        })
+        if(!userExist){
+            return res.status(409).json({message: "no user found"})
+        }
+        // console.log(userExist.dataValues.username)
+        res.status(200).json({user: userExist.dataValues.username})
+    }catch(err){
+        console.log(err)
+    }
+}
+
+exports.addUserToGroup = async (req, res) => {
+    try{
+      
+        const groupId = req.params.groupId;
+        const username = req.body.username;
+      const userExist = await GroupUsers.findOne({
+        where: {
+           username,
+           groupId
+        }
+      })
+      if(userExist){
+        // console.log('exist')
+        return res.status(305).json({message: "user already exist"})
+      }
+
+        const addUser = await GroupUsers.create({
+            username,
+            groupId,
+            isAdmin: false
+        })
+        // console.log(userExist)
+        // console.log("datatatata",addUser.dataValues)
+        const respo = addUser.dataValues
+        res.status(200).json(respo)
+
+
 
     }catch(err){
         console.log(err)

@@ -16,7 +16,7 @@ const group = require('./routes/group')
 const User = require('./models/users')
 const Chats = require('./models/chats')
 const Group = require('./models/groups')
-// const GroupUsers = require('./models/group_users')
+const GroupUsers = require('./models/group_users')
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -30,10 +30,10 @@ Chats.belongsTo(Group)
 
 // User.hasMany(GroupUsers)
 Group.hasMany(Chats)
-// Group.hasMany(GroupUsers)
+Group.hasMany(GroupUsers)
 
 // GroupUsers.belongsTo(User)
-// GroupUsers.belongsTo(Group)
+GroupUsers.belongsTo(Group)
 
 app.use('/', signup)
 app.use('/', login)

@@ -19,7 +19,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getAllMessages = async (req, res) => {
     try{
-        console.log(req.params)
+        // console.log(req.params)
         const lastMessageId = req.params.id;
         const groupId = req.params.groupId;
         let messages;
@@ -64,7 +64,7 @@ exports.getAllMessages = async (req, res) => {
 exports.saveMessages = async (req, res) => {
     try{
         // console.log('req.user',req.user)
-        console.log(req.body)
+        // console.log(req.body)
         // const message = req.body.message;
         // const date = req.body.date;
         // const isOwnMessage = req.body.isOwnMessage;

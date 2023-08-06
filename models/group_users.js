@@ -8,11 +8,20 @@ const GroupUsers = sequelize.define('group_users', {
         allowNull: false,
         primaryKey: true
     },
-    //  isadmin: {
-    //     type: Sequelize.BOOLEAN,
-    //     defaultValue: false,
-    //  },
-    
+    username:{
+       type: Sequelize.STRING,
+       allowNull:false
+    },
+     groupId: {
+        type: Sequelize.INTEGER,
+        // defaultValue: false,
+        allowNull:false,
+     },
+     isAdmin: {
+        type:Sequelize.BOOLEAN,
+        allowNull: false
+     }
+
 });
 
 module.exports = GroupUsers;

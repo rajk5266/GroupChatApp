@@ -1,48 +1,34 @@
 const token = { headers: { 'Authorization': localStorage.getItem('token') } }
-// console.log(token)
 
 $(document).ready(function () {
   $('#action_menu_btn').click(function () {
     $('.action_menu').toggle();
   });
 });
-window.addEventListener('DOMContentLoaded', async () => {
 
-  const storedMsg = localStorage.getItem('messages')
-  // console.log(storedMsg)
-  // if (storedMsg === null) {
-  //   // console.log('null')
-  //   await getAllMessages(undefined)
-  // }
-  // else {
-  //   const parsedMsg = JSON.parse(storedMsg);
-  //   const lastMessageId = parsedMsg[parsedMsg.length - 1].id
-  //   await getAllMessages(lastMessageId)
-  // }
-  // getAllUsers()
+window.addEventListener('DOMContentLoaded', async () => {
   getAllGroups()
 })
-async function getAllUsers() {
-  try {
-    // const users = await axios.get('http://localhost:5000/getAllUsers', token)
-    // const usernames = users.data.usernames
-    // //   console.log(users.data.names)
-    // for (let i = 0; i < usernames.length; i++) {
-    //   showUsers(usernames[i])
-    // }
-    // const searchUser = await axios.get
-  } catch (err) {
-    console.log(err)
-  }
-}
+
+// async function getAllUsers() {
+//   try {
+//     // const users = await axios.get('http://localhost:5000/getAllUsers', token)
+//     // const usernames = users.data.usernames
+//     // //   console.log(users.data.names)
+//     // for (let i = 0; i < usernames.length; i++) {
+//     //   showUsers(usernames[i])
+//     // }
+//     // const searchUser = await axios.get
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
 
 function continueFetching() {
   setInterval(() => {
     getAllMessages()
   }, 1000)
 }
-
-
 
 async function sendMessage(e) {
   e.preventDefault()
@@ -61,63 +47,20 @@ async function sendMessage(e) {
     groupId
   }
   showMessages(obj)
-  const messageSend = await axios.post('http://localhost:5000/messages',obj, token)
+  const messageSend = await axios.post('http://localhost:5000/messages', obj, token)
   console.log(messageSend)
   document.getElementById('messageInput').value = ''
 }
 
-// function showUsers(name) {
-//   const contacts = document.querySelector('.contacts');
-//   const userItem = document.createElement('li');
-//   userItem.classList.add('active');
-
-//   const userDiv = document.createElement('div');
-//   userDiv.classList.add('d-flex', 'bd-highlight');
-
-//   const imgCont = document.createElement('div');
-//   imgCont.classList.add('img_cont');
-
-//   const userImg = document.createElement('img');
-//   userImg.classList.add('rounded-circle', 'user_img');
-//   userImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQceWscr6c86ViMmGsFmkCx9aSslCiIx83Z3Q&usqp=CAU';
-
-//   // const onlineIcon = document.createElement('span');
-//   // onlineIcon.classList.add('online_icon');
-
-//   const userInfo = document.createElement('div');
-//   userInfo.classList.add('user_info');
-
-//   const usernameSpan = document.createElement('span');
-//   usernameSpan.textContent = name;
-
-//   // Uncomment the next lines if you want to display online status
-//   // const onlineStatus = document.createElement('p');
-//   // onlineStatus.textContent = `${name} is online`;
-
-//   // Append elements to create the desired structure
-//   imgCont.appendChild(userImg);
-//   // imgCont.appendChild(onlineIcon);
-//   userInfo.appendChild(usernameSpan);
-//   // Uncomment the next line to append the online status paragraph
-//   // userInfo.appendChild(onlineStatus);
-//   userDiv.appendChild(imgCont);
-//   userDiv.appendChild(userInfo);
-//   userItem.appendChild(userDiv);
-//   contacts.appendChild(userItem);
-
-//   contacts.scrollTop = contacts.scrollHeight
-// }
-
 async function createGroup(e) {
   try {
     e.preventDefault();
-    // const groupName = e.target.groupName.value
-    // console.log(groupName)
     const obj = {
-      groupName: e.target.groupName.value
+      groupName: e.target.groupName.value,
+      username : localStorage.getItem('username')
     }
+// console.log(obj, "[[[[")
     const createGroup = await axios.post('http://localhost:5000/createGroup', obj, token)
-    console.log(createGroup)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -126,11 +69,12 @@ async function createGroup(e) {
 
 async function getAllGroups() {
   try {
-    const allGroups = await axios.get('http://localhost:5000/getAllGroups', token)
+    const username = localStorage.getItem('username');
+    const allGroups = await axios.get(`http://localhost:5000/getAllGroups/${username}`, token)
+    // console.log(allGroups)
     const groups = allGroups.data.groups
-    // console.log(groups)
+   
     for (let i = 0; i < groups.length; i++) {
-
       showGroups(groups[i])
     }
   } catch (err) {
@@ -139,9 +83,8 @@ async function getAllGroups() {
 }
 
 async function showGroups(group) {
-  // console.log(group.id)
   const groupLists = document.querySelector('.contacts');
-  
+
   // Create a new <li> element for each group
   const singleGroup = document.createElement('li');
   // singleGroup.classList.add('active');
@@ -168,74 +111,92 @@ async function showGroups(group) {
   GroupButton.classList.add('openGroupButton');
   GroupButton.id = group.id
 
+
+
   groupInfo.appendChild(groupName);
   groupInfo.appendChild(GroupButton);
+
   // groupDiv.appendChild(imgContainer);
   groupDiv.appendChild(groupInfo);
   singleGroup.appendChild(groupDiv);
-  
 
-  // Append the <li> element to the <ul> with class "contacts"
   groupLists.appendChild(singleGroup);
+
   GroupButton.addEventListener('click', () => {
     const button = document.getElementById('sendMessageButton')
     button.dataset.groupId = group.id
 
-    // document.getElementById('sendMessageButton').style.display = 'block'
-
-   
-
-    // console.log(group.id)
-    // loadMessageSection(group.id)
-
-    // console.log(storedMsg)
-
-    // getAllMessages(1, group.id)
-    loadMessageSection(group.groupname, group.id)
+    loadMessageSection(group)
+    // document.getElementById('search-option').innerHTML = '';
+    // document.getElementById('userList').innerHTML = ''
   })
+
+  // showMembers.addEventListener('click', () => {
+
+  //   showMembersList(group.id)
+  // })
 }
 
-async function loadMessageSection(groupname, id) {
+async function loadMessageSection(group) {
   try {
-    document.getElementById('parentMessageContainer').innerHTML = ''
-    // document.getElementById('group_headbar').innerHTML = ''
-    const groupHeader = document.getElementById('group_headbar')
-    // groupHeader.removeChild(document.getElementById('addMemberButton'))
-
-    // console.log(groupname, id)
-    const groupName = document.getElementById('groupName')
-    groupName.textContent = groupname
-
-    const adddmemberbtn = document.getElementById('addMemberButton')
-    // console.log("button",adddmemberbtn)
-    const chatSection = document.getElementById('chatSection');
-    if(adddmemberbtn){
-      adddmemberbtn.dataset.id = id
-    }else{
-      const addButton = document.createElement('button')
-  
-      addButton.textContent = 'Add Member'
-      addButton.id = 'addMemberButton'
-      addButton.dataset.groupId = id
-      groupHeader.appendChild(addButton)
-    }
-    chatSection.style.display = 'block';
+    const username = localStorage.getItem('username')
    
+    document.getElementById('parentMessageContainer').innerHTML = ''
+    const groupHeader = document.getElementById('group_headbar')
+    
+    const groupName = document.getElementById('groupName')
+    groupName.textContent = group.groupname;
+
+    const chatSection = document.getElementById('chatSection');
+    if(group.admin === username){
+      const adddmemberbtn = document.querySelector('.addMemberButton')
+      const showMembers = document.querySelector('.showMembers')
+      if (adddmemberbtn || showMembers) {
+        adddmemberbtn.dataset.groupId = group.id;
+        showMembers.dataset.groupId = group.id;
+      } else {
+        const adddmemberbtn = document.createElement('button')
+        const showMembers = document.createElement('button');
+  
+        adddmemberbtn.textContent = 'Add Member'
+        adddmemberbtn.classList = 'addMemberButton'
+        adddmemberbtn.dataset.groupId = group.id
+        
+        showMembers.textContent = 'view Members';
+        showMembers.classList = 'showMembers'
+        showMembers.dataset.groupId= group.id
+        
+        groupHeader.appendChild(adddmemberbtn)
+        groupHeader.appendChild(showMembers)
+  
+        adddmemberbtn.addEventListener('click', () => {
+          if (!searchContainerExist) {
+            showSearchBar()
+          }
+        });
+  
+        showMembers.addEventListener('click', () => {
+  
+        })
+      }
+    }
+
+    
+    chatSection.style.display = 'block';
+
     // const groupMessages = await axios.get('http://localhost:5000/')
 
-    const storedMsg = localStorage.getItem(`${id}`)
-    console.log('storedmessage',storedMsg)
+    const storedMsg = localStorage.getItem(`${group.id}`)
     if (storedMsg === null) {
-      // console.log('null')
-      await getAllMessages(undefined , id)
+      console.log('null')
+      await getAllMessages(undefined, group.id)
     }
     else {
       const parsedMsg = JSON.parse(storedMsg);
       const lastMessageId = parsedMsg[parsedMsg.length - 1].id
-      console.log(lastMessageId)
-      await getAllMessages(lastMessageId, id)
+      // console.log(lastMessageId)
+      await getAllMessages(lastMessageId, group.id)
     }
-    // getAllMessages()
   } catch (err) {
     console.log(err)
   }
@@ -243,10 +204,9 @@ async function loadMessageSection(groupname, id) {
 
 async function getAllMessages(id, groupId) {
   try {
-    console.log('id', id)
-    console.log('groupId', groupId)
+
     const messages = await axios.get(`http://localhost:5000/getAllMessages/${id}/${groupId}`, token)
-    console.log(`${groupId}`,messages)
+
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
     if (storedMessages == null && newMessages.length == 0) {
@@ -294,9 +254,9 @@ async function getAllMessages(id, groupId) {
 }
 
 function showMessages(message) {
-  console.log("showmessages",message)
-  const parentMessageContainer = document.getElementById('parentMessageContainer');
 
+  const parentMessageContainer = document.getElementById('parentMessageContainer');
+ 
   const outerDiv = document.createElement('div');
   outerDiv.classList.add('d-flex', 'justify-content-start', 'mb-4');
 
@@ -329,6 +289,112 @@ function showMessages(message) {
   parentMessageContainer.appendChild(document.createElement('hr'))
 
   parentMessageContainer.scrollTop = parentMessageContainer.scrollHeight
+}
+
+let searchContainerExist = false
+
+function showSearchBar() {
+
+  const searchBarContainer = document.createElement('div');
+  searchBarContainer.classList.add('search-bar-container');
+
+  const searchInput = document.createElement('input');
+  searchInput.setAttribute('type', 'text');
+  searchInput.setAttribute('placeholder', 'Search User')
+  searchInput.setAttribute('required', '')
+  searchInput.classList.add('search-input');
+
+  const searchButton = document.createElement('button');
+  searchButton.textContent = 'Search';
+  searchButton.classList.add('search-button');
+
+  searchBarContainer.appendChild(searchInput);
+  searchBarContainer.appendChild(searchButton);
+
+  const removeButton = document.createElement('button')
+  removeButton.id = 'removeButton'
+  removeButton.textContent = 'X';
+  removeButton.onclick = () => {
+    searchSection.innerHTML = '';
+    searchContainerExist = false
+  }
+
+  const searchSection = document.getElementById('search-option')
+  // const userList = document.getElementById('userList')
+  // userList.appendChild(searchBarContainer)
+  // userList.appendChild(removeButton)
+  searchSection.appendChild(searchBarContainer)
+  searchSection.appendChild(removeButton)
+
+  searchContainerExist = true;
+
+  searchButton.onclick = () => {
+    const inputValue = searchInput.value
+    handleSearchUser(inputValue)
+  }
+}
+
+async function handleSearchUser(user) {
+  try {
+    const userResult = await axios.get(`http://localhost:5000/searchUser/${user}`, token)
+    // console.log("userExist",userResult)
+    const username = userResult.data.user
+    // console.log(username)
+    const userFoundSection = document.getElementById('userList')
+    userFoundSection.style.display = 'block';
+
+    const usernameLi = document.createElement('li')
+    const addToGroupButton = document.createElement('button')
+    addToGroupButton.textContent = 'Add';
+
+    const cancelButton = document.createElement('button')
+    cancelButton.textContent = 'X';
+
+    usernameLi.textContent = `${username}`
+    usernameLi.appendChild(addToGroupButton)
+    usernameLi.appendChild(cancelButton)
+
+    userFoundSection.appendChild(usernameLi)
+
+    addToGroupButton.onclick = () => {
+      addToGroup(username)
+      userFoundSection.innerHTML = ''
+    }
+    cancelButton.onclick = () => {
+      userFoundSection.innerHTML = ''
+      userFoundSection.removeAttribute('style')
+    }
+
+
+  } catch (err) {
+    console.log('err', err.response.data)
+
+    alert(err.response.data.message)
+  }
+}
+
+async function addToGroup(username) {
+  try{
+    // console.log("usserto addd",username)
+    const Button = document.getElementById('sendMessageButton');
+    const groupId = Button.dataset.groupId;
+    // console.log(groupId)
+    const addUserToGroup = await axios.post(`http://localhost:5000/addUserToGroup/${groupId}`, { username }, token)
+    console.log(addUserToGroup)
+    alert(`${username} added to group`)
+  }catch(err){
+    if(err.response.status === 305){
+      alert(err.response.data.message)
+    }
+  }
+}
+
+async function showMembersList(groupId) {
+  try {
+    console.log('--->', groupId)
+  } catch (err) {
+    
+  }
 }
 
 
