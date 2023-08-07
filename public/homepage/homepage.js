@@ -57,9 +57,9 @@ async function createGroup(e) {
     e.preventDefault();
     const obj = {
       groupName: e.target.groupName.value,
-      username : localStorage.getItem('username')
+      username: localStorage.getItem('username')
     }
-// console.log(obj, "[[[[")
+    // console.log(obj, "[[[[")
     const createGroup = await axios.post('http://localhost:5000/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
@@ -73,7 +73,7 @@ async function getAllGroups() {
     const allGroups = await axios.get(`http://localhost:5000/getAllGroups/${username}`, token)
     // console.log(allGroups)
     const groups = allGroups.data.groups
-   
+
     for (let i = 0; i < groups.length; i++) {
       showGroups(groups[i])
     }
@@ -85,11 +85,8 @@ async function getAllGroups() {
 async function showGroups(group) {
   const groupLists = document.querySelector('.contacts');
 
-  // Create a new <li> element for each group
   const singleGroup = document.createElement('li');
-  // singleGroup.classList.add('active');
 
-  // Create the inner elements for the group
   const groupDiv = document.createElement('div');
   groupDiv.classList.add('d-flex', 'bd-highlight');
 
@@ -111,12 +108,9 @@ async function showGroups(group) {
   GroupButton.classList.add('openGroupButton');
   GroupButton.id = group.id
 
-
-
   groupInfo.appendChild(groupName);
   groupInfo.appendChild(GroupButton);
 
-  // groupDiv.appendChild(imgContainer);
   groupDiv.appendChild(groupInfo);
   singleGroup.appendChild(groupDiv);
 
@@ -125,30 +119,26 @@ async function showGroups(group) {
   GroupButton.addEventListener('click', () => {
     const button = document.getElementById('sendMessageButton')
     button.dataset.groupId = group.id
-
     loadMessageSection(group)
-    // document.getElementById('search-option').innerHTML = '';
-    // document.getElementById('userList').innerHTML = ''
   })
-
-  // showMembers.addEventListener('click', () => {
-
-  //   showMembersList(group.id)
-  // })
 }
 
 async function loadMessageSection(group) {
   try {
+    const admins = group.admin.split(',')
+    console.log(admins)
+    const admin = new Set(admins)
+    console.log(admin)
     const username = localStorage.getItem('username')
-   
+
     document.getElementById('parentMessageContainer').innerHTML = ''
     const groupHeader = document.getElementById('group_headbar')
-    
+
     const groupName = document.getElementById('groupName')
     groupName.textContent = group.groupname;
 
     const chatSection = document.getElementById('chatSection');
-    if(group.admin === username){
+    if (admin.has(username)) {
       const adddmemberbtn = document.querySelector('.addMemberButton')
       const showMembers = document.querySelector('.showMembers')
       if (adddmemberbtn || showMembers) {
@@ -157,38 +147,36 @@ async function loadMessageSection(group) {
       } else {
         const adddmemberbtn = document.createElement('button')
         const showMembers = document.createElement('button');
-  
+
         adddmemberbtn.textContent = 'Add Member'
         adddmemberbtn.classList = 'addMemberButton'
         adddmemberbtn.dataset.groupId = group.id
-        
+
         showMembers.textContent = 'view Members';
         showMembers.classList = 'showMembers'
-        showMembers.dataset.groupId= group.id
-        
+        showMembers.dataset.groupId = group.id
+
         groupHeader.appendChild(adddmemberbtn)
         groupHeader.appendChild(showMembers)
-  
+
         adddmemberbtn.addEventListener('click', () => {
-          if (!searchContainerExist) {
-            showSearchBar()
-          }
+          // if (!searchContainerExist) {
+          showSearchBar()
+          // }
         });
-  
+
         showMembers.addEventListener('click', () => {
-  
+          const groupId = document.querySelector('.showMembers').dataset.groupId
+          //  console.log(groupId)
+          showMembersList(groupId)
         })
       }
     }
-
-    
     chatSection.style.display = 'block';
-
-    // const groupMessages = await axios.get('http://localhost:5000/')
 
     const storedMsg = localStorage.getItem(`${group.id}`)
     if (storedMsg === null) {
-      console.log('null')
+      // console.log('null')
       await getAllMessages(undefined, group.id)
     }
     else {
@@ -206,6 +194,7 @@ async function getAllMessages(id, groupId) {
   try {
 
     const messages = await axios.get(`http://localhost:5000/getAllMessages/${id}/${groupId}`, token)
+    // console.log(messages)
 
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
@@ -254,9 +243,9 @@ async function getAllMessages(id, groupId) {
 }
 
 function showMessages(message) {
-
+  // console.log(message)
   const parentMessageContainer = document.getElementById('parentMessageContainer');
- 
+
   const outerDiv = document.createElement('div');
   outerDiv.classList.add('d-flex', 'justify-content-start', 'mb-4');
 
@@ -271,15 +260,12 @@ function showMessages(message) {
   }
   else {
     messageContent.classList.add('msg_container_others')
-    time.classList.add('others_message_time')
+    time.classList.add('others_message_time');
+    name.textContent = message.username
   }
-  // console.log(message)
-  name.textContent = message.name
+
   messageContent.textContent = message.message;
   time.textContent = message.date
-  // messageContent.prepend(document.createElement('br'))
-  // messageContent.prepend(name)
-  // messageContent.appendChild(document.createElement('br'))
 
   outerDiv.appendChild(messageContent);
 
@@ -291,9 +277,12 @@ function showMessages(message) {
   parentMessageContainer.scrollTop = parentMessageContainer.scrollHeight
 }
 
-let searchContainerExist = false
+let searchContainerExist = false;
+const searchSection = document.getElementById('search-option');
 
 function showSearchBar() {
+
+  searchSection.innerHTML = '';
 
   const searchBarContainer = document.createElement('div');
   searchBarContainer.classList.add('search-bar-container');
@@ -319,12 +308,12 @@ function showSearchBar() {
     searchContainerExist = false
   }
 
-  const searchSection = document.getElementById('search-option')
+  // const searchSection = document.getElementById('search-option')
   // const userList = document.getElementById('userList')
   // userList.appendChild(searchBarContainer)
   // userList.appendChild(removeButton)
   searchSection.appendChild(searchBarContainer)
-  searchSection.appendChild(removeButton)
+  // searchSection.appendChild(removeButton)
 
   searchContainerExist = true;
 
@@ -332,6 +321,13 @@ function showSearchBar() {
     const inputValue = searchInput.value
     handleSearchUser(inputValue)
   }
+
+  const modalBody = document.getElementById('groupMembersModalBody')
+  modalBody.innerHTML = '';
+  modalBody.appendChild(searchSection);
+
+  const groupMembersModal = new bootstrap.Modal(document.getElementById('groupMembersModal'));
+  groupMembersModal.show();
 }
 
 async function handleSearchUser(user) {
@@ -344,6 +340,7 @@ async function handleSearchUser(user) {
     userFoundSection.style.display = 'block';
 
     const usernameLi = document.createElement('li')
+    usernameLi.style.textDecoration = 'none'
     const addToGroupButton = document.createElement('button')
     addToGroupButton.textContent = 'Add';
 
@@ -354,15 +351,16 @@ async function handleSearchUser(user) {
     usernameLi.appendChild(addToGroupButton)
     usernameLi.appendChild(cancelButton)
 
-    userFoundSection.appendChild(usernameLi)
+    searchSection.appendChild(usernameLi)
 
     addToGroupButton.onclick = () => {
       addToGroup(username)
       userFoundSection.innerHTML = ''
     }
     cancelButton.onclick = () => {
-      userFoundSection.innerHTML = ''
-      userFoundSection.removeAttribute('style')
+      usernameLi.remove();
+
+      // userFoundSection.removeAttribute('style')
     }
 
 
@@ -374,16 +372,16 @@ async function handleSearchUser(user) {
 }
 
 async function addToGroup(username) {
-  try{
+  try {
     // console.log("usserto addd",username)
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
     // console.log(groupId)
     const addUserToGroup = await axios.post(`http://localhost:5000/addUserToGroup/${groupId}`, { username }, token)
-    console.log(addUserToGroup)
+    // console.log(addUserToGroup)
     alert(`${username} added to group`)
-  }catch(err){
-    if(err.response.status === 305){
+  } catch (err) {
+    if (err.response.status === 305) {
       alert(err.response.data.message)
     }
   }
@@ -391,11 +389,105 @@ async function addToGroup(username) {
 
 async function showMembersList(groupId) {
   try {
-    console.log('--->', groupId)
-  } catch (err) {
     
+    const groupMembers = await axios.get(`http://localhost:5000/getGroupMemebersList/${groupId}`, token)
+
+    const users = groupMembers.data;
+    console.log(users)
+    const modalBody = document.getElementById('groupMembersModalBody')
+    modalBody.innerHTML = '';
+
+    const userList = document.createElement('ul');
+    userList.classList.add('list-group');
+
+    for (let i = 0; i < users.length; i++) {
+      const admin = users[i].isAdmin;
+      const username = users[i].username
+
+      const listItem = document.createElement('li');
+      listItem.classList.add('list-group-item');
+
+      function makeAdminTag() {
+        // listItem.innerHTML = ''
+        const adminTag = document.createElement('span')
+        adminTag.classList.add('admin')
+        listItem.textContent = username;
+        adminTag.textContent = 'Admin'
+        adminTag.style.backgroundColor = 'grey'
+        listItem.appendChild(adminTag)
+      }
+      function makeMemberTag() {
+        const makeAdminButton = document.createElement('button')
+        const removeMemberButton = document.createElement('button')
+        makeAdminButton.classList.add('make-admin-btn')
+        removeMemberButton.classList.add('remove-member-Button')
+        makeAdminButton.dataset.groupId = groupId;
+        removeMemberButton.dataset.groupId = groupId;
+
+        listItem.textContent = username;
+        makeAdminButton.textContent = 'Make Admin';
+        removeMemberButton.textContent = 'Remove'
+        listItem.appendChild(makeAdminButton)
+        listItem.appendChild(removeMemberButton)
+
+        removeMemberButton.addEventListener('click', () => {
+          removeMember(groupId, username, removeMemberTag)
+        })
+
+        makeAdminButton.addEventListener('click', () => {
+          makeAdmin(groupId, username, makeAdminTag)
+        })
+      }
+
+
+      if (admin === true) {
+        makeAdminTag()
+      } else {
+        makeMemberTag()
+      }
+      userList.appendChild(listItem);
+
+      const removeMemberTag = () => {
+        listItem.innerHTML = `${username} - removed from group`
+      }
+    }
+    modalBody.appendChild(userList);
+    const groupMembersModal = new bootstrap.Modal(document.getElementById('groupMembersModal'));
+    groupMembersModal.show();
+  } catch (err) {
   }
 }
+
+async function removeMember(groupId, username, removeMemberTag) {
+  try {
+    const removeMember = await axios.delete(`http://localhost:5000/removeMember/${groupId}/${username}`, token)
+    removeMemberTag()
+  } catch (err) {
+    console.log(err)
+  }
+
+}
+
+async function makeAdmin(groupId, username, makeAdminTag) {
+  try {
+    console.log('make admin')
+    // console.log(groupId, username)
+    // let x = 1;
+    // if(x == 1){
+    //   makeAdminTag()
+    // }
+    const makeAdmin = await axios.put(`http://localhost:5000/makeMemberAdmin/${groupId}/${username}`, token)
+    console.log(makeAdmin)
+    if(makeAdmin.status === 200){
+      makeAdminTag()
+    }
+
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+
 
 
 

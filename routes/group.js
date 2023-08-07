@@ -11,5 +11,11 @@ router.get('/searchUser/:user', auth.auth, controller.searchUser )
 
 router.post('/addUserToGroup/:groupId', auth.auth, controller.addUserToGroup)
 
+router.get('/getGroupMemebersList/:groupId', auth.auth, controller.showGroupMembers)
+
+router.delete('/removeMember/:groupId/:username', auth.auth, controller.removeMember)
+
+router.put('/makeMemberAdmin/:groupId/:username', controller.makeAdmin)
+
 
 module.exports = router
