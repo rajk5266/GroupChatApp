@@ -3,7 +3,7 @@ const Users = require('../models/users')
 const bcrypt = require('bcrypt');
 
 exports.signUpPage = (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'signup', 'signUp.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'signup', 'signup.html'))
 }
 
 exports.userSignUpDetails = async (req, res) => {
