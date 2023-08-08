@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // async function getAllUsers() {
 //   try {
-//     // const users = await axios.get('b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/getAllUsers', token)
+//     // const users = await axios.get('https://chatprivate.onrender.com/getAllUsers', token)
 //     // const usernames = users.data.usernames
 //     // //   console.log(users.data.names)
 //     // for (let i = 0; i < usernames.length; i++) {
@@ -60,7 +60,7 @@ async function createGroup(e) {
       username: localStorage.getItem('username')
     }
     // console.log(obj, "[[[[")
-    const createGroup = await axios.post('b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/createGroup', obj, token)
+    const createGroup = await axios.post('https://chatprivate.onrender.com/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -70,7 +70,7 @@ async function createGroup(e) {
 async function getAllGroups() {
   try {
     const username = localStorage.getItem('username');
-    const allGroups = await axios.get(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/getAllGroups/${username}`, token)
+    const allGroups = await axios.get(`https://chatprivate.onrender.com/getAllGroups/${username}`, token)
     // console.log(allGroups)
     const groups = allGroups.data.groups
 
@@ -184,7 +184,7 @@ async function loadMessageSection(group) {
 async function getAllMessages(id, groupId) {
   try {
 
-    const messages = await axios.get(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/getAllMessages/${id}/${groupId}`, token)
+    const messages = await axios.get(`https://chatprivate.onrender.com/getAllMessages/${id}/${groupId}`, token)
 
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
@@ -322,7 +322,7 @@ function showSearchBar() {
 
 async function handleSearchUser(user) {
   try {
-    const userResult = await axios.get(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/searchUser/${user}`, token)
+    const userResult = await axios.get(`https://chatprivate.onrender.com/searchUser/${user}`, token)
     // console.log("userExist",userResult)
     const username = userResult.data.user
     // console.log(username)
@@ -376,7 +376,7 @@ async function addToGroup(username) {
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
     // console.log(groupId)
-    const addUserToGroup = await axios.post(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/addUserToGroup/${groupId}`, { username }, token)
+    const addUserToGroup = await axios.post(`https://chatprivate.onrender.com/addUserToGroup/${groupId}`, { username }, token)
     // console.log(addUserToGroup)
     alert(`${username} added to group`)
   } catch (err) {
@@ -389,7 +389,7 @@ async function addToGroup(username) {
 async function showMembersList(groupId) {
   try {
     
-    const groupMembers = await axios.get(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/getGroupMemebersList/${groupId}`, token)
+    const groupMembers = await axios.get(`https://chatprivate.onrender.com/getGroupMemebersList/${groupId}`, token)
 
     const users = groupMembers.data;
     // console.log(users)
@@ -462,7 +462,7 @@ async function showMembersList(groupId) {
 
 async function removeMember(groupId, username, removeMemberTag) {
   try {
-    const removeMember = await axios.delete(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/removeMember/${groupId}/${username}`, token)
+    const removeMember = await axios.delete(`https://chatprivate.onrender.com/removeMember/${groupId}/${username}`, token)
     removeMemberTag()
   } catch (err) {
     console.log(err)
@@ -473,7 +473,7 @@ async function removeMember(groupId, username, removeMemberTag) {
 async function makeAdmin(groupId, username, makeAdminTag) {
   try {
     console.log('make admin')
-    const makeAdmin = await axios.put(`b8ikuqs8c2jd3buwl0qk-mysql.services.clever-cloud.com/makeMemberAdmin/${groupId}/${username}`, token)
+    const makeAdmin = await axios.put(`https://chatprivate.onrender.com/makeMemberAdmin/${groupId}/${username}`, token)
     console.log(makeAdmin)
     if(makeAdmin.status === 200){
       makeAdminTag()
