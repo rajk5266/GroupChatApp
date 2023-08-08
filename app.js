@@ -25,14 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 User.hasMany(Chats)
 Chats.belongsTo(User)
-
 Chats.belongsTo(Group)
-
-// User.hasMany(GroupUsers)
 Group.hasMany(Chats)
 Group.hasMany(GroupUsers)
 
-// GroupUsers.belongsTo(User)
 GroupUsers.belongsTo(Group)
 
 app.use('/', signup)
