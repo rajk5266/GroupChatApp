@@ -5,11 +5,11 @@ async function login(event) {
             email: event.target.email.value,
             password: event.target.password.value
         }
-        const logindetails = await axios.post(`https://chatprivate.onrender.com/login`, obj)
+        const logindetails = await axios.post(`http://localhost:4000/login`, obj)
         if(logindetails.status === 200){
             localStorage.setItem('token', logindetails.data.token)
 
-            window.location.href = 'https://chatprivate.onrender.com/homePage'
+            window.location.href = 'http://localhost:4000/homePage'
         }else{
             console.log('failed to login')
         }

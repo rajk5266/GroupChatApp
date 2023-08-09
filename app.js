@@ -1,4 +1,10 @@
 require('dotenv').config();
+const io = require('socket.io')(4000)
+console.log('---------------------------')
+io.on('connection', socket => {
+    console.log('socket ID', socket.id)
+})
+
 const express = require('express')
 const path = require('path');
 const bodyParser = require('body-parser')
@@ -41,6 +47,6 @@ sequelize
     .sync()
     .then(result => {
         console.log('database connected')
-        app.listen(process.env.PORT || 5000)
+        app.listen(process.env.PORT || 4000)
     })
     .catch(err => console.log(err))

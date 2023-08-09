@@ -70,7 +70,7 @@ exports.saveMessages = async (req, res) => {
         // const isOwnMessage = req.body.isOwnMessage;
         // const groupId = req.body.groupId
         const {message,date,groupId} = req.body
-        // console.log(message,"---",date,)
+        console.log(message,"---",date,)
         const userName = await Users.findOne({
             where:{
                 id: req.user
