@@ -16,10 +16,9 @@ const group = require('./routes/group')
 const User = require('./models/users')
 const Chats = require('./models/chats')
 const Group = require('./models/groups')
-const GroupUsers = require('./models/group_users')
+const GroupUsers = require('./models/group_users');
 
-
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -40,11 +39,25 @@ app.use('/', login)
 app.use('/', homePage)
 app.use('/', group)
 
-
 sequelize
     .sync()
     .then(result => {
         console.log('database connected')
-        app.listen(process.env.PORT || 5000)
+        const server = app.listen(process.env.PORT || 3000, () => {
+            console.log(`server is running on port 3000`)
+        })
+        const io = require('socket.io')(server)
+        io.on('connection', socket => {
+            console.log('A user Connected');
+            // console.log('socketID', socket.id)
+            console.log(socket.id)
+            socket.on('send-message', (messageObj) => {
+                socket.broadcast.emit('receive-message', messageObj);
+                console.log("-----", messageObj);
+            });
+            socket.on('disconnect', () => {
+                console.log('user disconnected')
+            })
+        })
     })
     .catch(err => console.log(err))

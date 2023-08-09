@@ -7,11 +7,11 @@ async function signup(event) {
             password: event.target.password.value
         }
         localStorage.setItem('username', event.target.username.value)
-        const response = await axios.post('http://localhost:5000/signup', signupdetails)
+        const response = await axios.post('http://localhost:3000/signup', signupdetails)
         console.log(response)
         if (response.status === 200) {
             alert('registered successfully')
-            window.location.href = "http://localhost:5000"
+            window.location.href = "http://localhost:3000"
         }
         // console.log(response.data)
     } catch (err) {

@@ -77,8 +77,10 @@ background-color: rgba(0,0,0,0.3) !important;
     cursor: pointer;
 } */
 .contacts{
+    width: 100%;
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 .contacts li{
     width: 100% !important;
@@ -280,14 +282,97 @@ margin-bottom: 15px !important;
     background-color: #0c92aa;
 }
 
-.addMemberButton{
-    background-color: rgb(55, 55, 250);
-    margin-left: 40%;
-    margin-top: 10px;
-    height: 50px;
-    border-radius: 20px;
-}
-
 #userList{
     /* border: 1px solid rgb(8, 100, 220); */
 }
+.card .user_info{
+    width: 100%;
+}
+.openGroupButton{
+    background-color: rgb(48, 48, 227);
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 10px;
+    color: white;
+    text-align: left;
+}
+.addMemberButton{
+    /* background-color: transparent; */
+    border: none;
+    outline: none;
+    background-color: rgb(68, 68, 253);
+    color: white;
+    border-radius: 8px;
+    margin: 5px;
+    font-weight: bolder;
+}
+.showMembers{
+    border: none;
+    outline: none;
+    background-color: rgb(240, 227, 227);
+    color: rgb(48, 48, 227);
+    border-radius: 8px;
+    margin: 5px;
+    font-weight: bolder;
+}
+
+.search-bar-container{
+    display: flex;
+}
+.search-bar-container input{
+   width: 100%;
+   border-top-left-radius: 8px;
+   border-bottom-left-radius: 8px;
+   /* border-radius: 8px; */
+   padding: 5px;
+}
+.search-bar-container button{
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+   outline: none;
+   border: none;
+   color: white;
+   /* margin: 6px; */
+   padding: 10px;
+   background-color: rgb(48, 48, 227);;
+}
+
+/* .modal .modal-body .search-option .searchedUser{
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between;
+    padding: 6px 0;
+} */
+.searchedUser{
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between; 
+    padding: 6px 0;
+}
+.searchedUser button {
+    border: none;
+    outline: none;
+    background-color: #0b58b7;
+    color: white;
+    margin: 5px;
+    padding: 6px;
+}
+.list-group-item{
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+.list-group-item span{
+    font-size: 12px;
+    opacity: .7;
+}
+.list-group-item button {
+    background-color: #0c92aa;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 4px;
+}
+
