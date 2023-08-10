@@ -13,7 +13,6 @@ async function signup(event) {
             alert('registered successfully')
             window.location.href = "http://localhost:4000"
         }
-        // console.log(response.data)
     } catch (err) {
         console.log("errorro", err)
         const error = err.response.data.message;
