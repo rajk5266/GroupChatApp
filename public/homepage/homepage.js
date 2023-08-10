@@ -6,7 +6,7 @@ $(document).ready(function () {
   });
 });
 
-const socket = io('http://localhost:3000')
+const socket = io('http://chatprivate.onrender.com')
 
 socket.on('connect', () => {
   console.log('connected')
@@ -68,7 +68,7 @@ const sendMessage = async (event) => {
         groupId
       }
       // console.log(payload)
-      const response = await axios.post('http://localhost:3000/sendMediaFile', payload, token);
+      const response = await axios.post('http://chatprivate.onrender.com/sendMediaFile', payload, token);
       // console.log(response)
       socket.emit('send-media', payload)
       // messageInput.disabled = false
@@ -94,7 +94,7 @@ const sendMessage = async (event) => {
 
     socket.emit('send-message', messageObj);
     showMessages(messageObj)
-    const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
+    const messageSend = await axios.post('http://chatprivate.onrender.com/messages', messageObj, token)
     messageInput.value = ''; 
   }
 };
@@ -119,7 +119,7 @@ const sendMessage = async (event) => {
 //   console.log(messageObj)
 //   showMessages(messageObj)
 //   socket.emit('send-message', messageObj)
-//   const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
+//   const messageSend = await axios.post('http://chatprivate.onrender.com/messages', messageObj, token)
 //   // console.log(messageSend)
 //   document.getElementById('messageInput').value = ''
 // }
@@ -132,7 +132,7 @@ async function createGroup(e) {
       username: localStorage.getItem('username')
     }
     console.log(obj, "[[[[")
-    const createGroup = await axios.post('http://localhost:3000/createGroup', obj, token)
+    const createGroup = await axios.post('http://chatprivate.onrender.com/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -143,7 +143,7 @@ async function getAllGroups() {
   try {
 
     const username = localStorage.getItem('username');
-    const allGroups = await axios.get(`http://localhost:3000/getAllGroups/${username}`, token)
+    const allGroups = await axios.get(`http://chatprivate.onrender.com/getAllGroups/${username}`, token)
     // console.log(allGroups)
     const groups = allGroups.data.groups
 
@@ -271,7 +271,7 @@ async function loadMessageSection(group) {
 async function getAllMessages(id, groupId) {
   try {
 
-    const messages = await axios.get(`http://localhost:3000/getAllMessages/${id}/${groupId}`, token)
+    const messages = await axios.get(`http://chatprivate.onrender.com/getAllMessages/${id}/${groupId}`, token)
     // console.log(messages)
 
     const newMessages = messages.data.usersMessages;
@@ -447,7 +447,7 @@ function showSearchBar() {
 
 async function handleSearchUser(user) {
   try {
-    const userResult = await axios.get(`http://localhost:3000/searchUser/${user}`, token)
+    const userResult = await axios.get(`http://chatprivate.onrender.com/searchUser/${user}`, token)
     // console.log("userExist",userResult)
     const username = userResult.data.user
     // console.log(username)
@@ -499,7 +499,7 @@ async function addToGroup(username) {
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
     // console.log(groupId)
-    const addUserToGroup = await axios.post(`http://localhost:3000/addUserToGroup/${groupId}`, { username }, token)
+    const addUserToGroup = await axios.post(`http://chatprivate.onrender.com/addUserToGroup/${groupId}`, { username }, token)
     // console.log(addUserToGroup)
     alert(`${username} added to group`)
   } catch (err) {
@@ -512,7 +512,7 @@ async function addToGroup(username) {
 async function showMembersList(groupId) {
   try {
 
-    const groupMembers = await axios.get(`http://localhost:3000/getGroupMemebersList/${groupId}`, token)
+    const groupMembers = await axios.get(`http://chatprivate.onrender.com/getGroupMemebersList/${groupId}`, token)
 
     const users = groupMembers.data;
     // console.log(users)
@@ -585,7 +585,7 @@ async function showMembersList(groupId) {
 
 async function removeMember(groupId, username, removeMemberTag) {
   try {
-    const removeMember = await axios.delete(`http://localhost:3000/removeMember/${groupId}/${username}`, token)
+    const removeMember = await axios.delete(`http://chatprivate.onrender.com/removeMember/${groupId}/${username}`, token)
     removeMemberTag()
   } catch (err) {
     console.log(err)
@@ -596,7 +596,7 @@ async function removeMember(groupId, username, removeMemberTag) {
 async function makeAdmin(groupId, username, makeAdminTag) {
   try {
     console.log('make admin')
-    const makeAdmin = await axios.put(`http://localhost:3000/makeMemberAdmin/${groupId}/${username}`, token)
+    const makeAdmin = await axios.put(`http://chatprivate.onrender.com/makeMemberAdmin/${groupId}/${username}`, token)
     console.log(makeAdmin)
     if (makeAdmin.status === 200) {
       makeAdminTag()
