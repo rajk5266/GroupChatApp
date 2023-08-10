@@ -10,48 +10,119 @@ const socket = io('http://localhost:3000')
 
 socket.on('connect', () => {
   console.log('connected')
-  // alert('you are connected')
 })
-
-// socket.on('receive-message', obj => {
-//   console.log(obj)
-//   showMessages(obj)
-// })
-
 
 window.addEventListener('DOMContentLoaded', async () => {
   getAllGroups()
 })
 
-function continueFetching() {
-  setInterval(() => {
-    getAllMessages()
-  }, 1000)
-}
+const fileButton = document.getElementById('fileButton');
+const mediaInput = document.getElementById('mediaInput');
+const messageInput = document.getElementById('messageInput');
+const fileSelectedMessage = document.getElementById('fileSelectedMessage');
+const fileNameElement = document.getElementById('fileName');
 
-async function sendMessage(e) {
-  e.preventDefault()
+fileButton.addEventListener('click', () => {
+  mediaInput.click();
+  fileSelectedMessage.style.display = 'none';
+  // console.log(mediaInput.files)
+});
 
-  const message = document.getElementById('messageInput').value
-  const DATE = new Date()
-  const date = DATE.toString().slice(4, 21)
-  const username = localStorage.getItem('username')
-  const groupId = document.getElementById('sendMessageButton').dataset.groupId
-console.log(username)
-  const messageObj = {
-    username,
-    message,
-    date,
-    isOwnMessage: true,
-    groupId
+mediaInput.addEventListener('change', () => {
+  const selectedFile = mediaInput.files[0];
+  // messageInput.disabled = true;
+  if (selectedFile) {
+    fileSelectedMessage.style.display = 'block';
+    fileNameElement.textContent = selectedFile.name;
+  } else {
+    fileSelectedMessage.style.display = 'none';
   }
-  console.log(messageObj)
-  showMessages(messageObj)
-  socket.emit('send-message', messageObj)
-  const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
-  // console.log(messageSend)
-  document.getElementById('messageInput').value = ''
-}
+});
+
+const sendMessage = async (event) => {
+  event.preventDefault();
+
+  const message = messageInput.value;
+  const selectedFile = mediaInput.files[0];
+  const username = localStorage.getItem('username');
+  const DATE = new Date();
+  const date = DATE.toString().slice(4, 21);
+  const groupId = document.getElementById('sendMessageButton').dataset.groupId;
+  // console.log(selectedFile.name)
+
+  if (selectedFile) {
+    console.log('selected media');
+    // messageInput.disabled = true;
+
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(selectedFile)
+
+    fileReader.onload = async function () {
+      const base64String = fileReader.result.split(',')[1];
+      const payload = {
+        username,
+        media: base64String,
+        type: 'image',
+        date,
+        isOwnMessage: true,
+        groupId
+      }
+      // console.log(payload)
+      const response = await axios.post('http://localhost:3000/sendMediaFile', payload, token);
+      // console.log(response)
+      socket.emit('send-media', payload)
+      // messageInput.disabled = false
+      showMessages(payload)
+    }
+    const imageElement = document.createElement('img')
+    imageElement.src = ``;
+    document.body.appendChild(imageElement)
+    mediaInput.value = '';
+    fileNameElement.innerHTML = ''
+  } else if (message) {
+
+    // console.log(obj)
+    console.log(message)
+    // messageInput.disabled = false;
+    const messageObj = {
+      username,
+      message,
+      date,
+      isOwnMessage: true,
+      groupId
+    };
+
+    socket.emit('send-message', messageObj);
+    showMessages(messageObj)
+    const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
+    messageInput.value = ''; 
+  }
+};
+
+
+// async function sendMessage(e) {
+//   e.preventDefault()
+
+//   const message = document.getElementById('messageInput').value
+//   const DATE = new Date()
+//   const date = DATE.toString().slice(4, 21)
+//   const username = localStorage.getItem('username')
+//   const groupId = document.getElementById('sendMessageButton').dataset.groupId
+// console.log(username)
+//   const messageObj = {
+//     username,
+//     message,
+//     date,
+//     isOwnMessage: true,
+//     groupId
+//   }
+//   console.log(messageObj)
+//   showMessages(messageObj)
+//   socket.emit('send-message', messageObj)
+//   const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
+//   // console.log(messageSend)
+//   document.getElementById('messageInput').value = ''
+// }
 
 async function createGroup(e) {
   try {
@@ -127,8 +198,12 @@ async function loadMessageSection(group) {
   try {
     socket.on('receive-message', messageObj => {
       // console.log('receive message')
-      // console.log(obj)
+      console.log(messageObj)
       showMessages(messageObj)
+    })
+    socket.on('receive-media', mediaObj => {
+      console.log(mediaObj)
+      showMessages(mediaObj)
     })
     const admins = group.admin.split(',')
     const admin = new Set(admins)
@@ -254,32 +329,68 @@ function showMessages(message) {
   outerDiv.classList.add('d-flex', 'justify-content-start', 'mb-4');
 
   const messageContent = document.createElement('div');
-  // console.log(message.isOwnMessage)
   const time = document.createElement('span')
   const name = document.createElement('span')
-  if (message.username == username) {
-    messageContent.classList.add('msg_container_own');
-    time.classList.add('own_message_time')
-    message.name = ''
+  const decodedMessage = decodeURIComponent(message.message)
+
+  if (decodedMessage.startsWith('https')) {
+    const imageElement = document.createElement('img');
+    imageElement.src = message.message;
+    imageElement.classList.add('chat-image');
+    if (message.username == username) {
+      messageContent.classList.add('msg_container_own');
+      time.classList.add('own_message_time')
+      message.name = ''
+    }
+    else {
+      messageContent.classList.add('msg_container_others')
+      time.classList.add('others_message_time');
+      name.textContent = message.username
+    }
+    messageContent.appendChild(imageElement);
   }
+  else if (message.type === 'image') {
+    // If the message type is 'image', assume it's image data from socket event
+    const imageElement = document.createElement('img');
+    imageElement.src = `data:image/jpeg;base64,${message.media}`;
+    imageElement.classList.add('chat-image');
+    messageContent.appendChild(imageElement);
+
+    if (message.username == username) {
+      messageContent.classList.add('msg_container_own');
+      time.classList.add('own_message_time');
+      message.name = '';
+    } else {
+      messageContent.classList.add('msg_container_others');
+      time.classList.add('others_message_time');
+      name.textContent = message.username;
+    }
+  }
+  
   else {
-    messageContent.classList.add('msg_container_others')
-    time.classList.add('others_message_time');
-    name.textContent = message.username
+    // console.log('messages')
+    if (message.username == username) {
+      messageContent.classList.add('msg_container_own');
+      time.classList.add('own_message_time')
+      message.name = ''
+    }
+    else {
+      messageContent.classList.add('msg_container_others')
+      time.classList.add('others_message_time');
+      name.textContent = message.username
+    }
+    messageContent.textContent = message.message;
   }
-
-  messageContent.textContent = message.message;
   time.textContent = message.date
-
   outerDiv.appendChild(messageContent);
-
   parentMessageContainer.appendChild(name)
   parentMessageContainer.appendChild(outerDiv);
   parentMessageContainer.appendChild(time)
   parentMessageContainer.appendChild(document.createElement('hr'))
-
   parentMessageContainer.scrollTop = parentMessageContainer.scrollHeight
 }
+
+
 
 let searchContainerExist = false;
 const searchSection = document.getElementById('search-option');
@@ -400,7 +511,7 @@ async function addToGroup(username) {
 
 async function showMembersList(groupId) {
   try {
-    
+
     const groupMembers = await axios.get(`http://localhost:3000/getGroupMemebersList/${groupId}`, token)
 
     const users = groupMembers.data;
@@ -429,7 +540,7 @@ async function showMembersList(groupId) {
       }
 
       function makeMemberTag() {
-        const ButtonDiv = document.createElement('div'); 
+        const ButtonDiv = document.createElement('div');
 
         const makeAdminButton = document.createElement('button')
         const removeMemberButton = document.createElement('button')
@@ -487,7 +598,7 @@ async function makeAdmin(groupId, username, makeAdminTag) {
     console.log('make admin')
     const makeAdmin = await axios.put(`http://localhost:3000/makeMemberAdmin/${groupId}/${username}`, token)
     console.log(makeAdmin)
-    if(makeAdmin.status === 200){
+    if (makeAdmin.status === 200) {
       makeAdminTag()
     }
 

@@ -376,3 +376,7 @@ margin-bottom: 15px !important;
     margin: 4px;
 }
 
+.chat-image{
+    width: 200px;
+    height: 200px;
+}

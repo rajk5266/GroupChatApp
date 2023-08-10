@@ -11,4 +11,6 @@ router.get('/getAllMessages/:id/:groupId', auth.auth, controller.getAllMessages)
 
 router.post('/messages', auth.auth, controller.saveMessages)
 
+router.post('/sendMediaFile', auth.auth, controller.saveMediaFile)
+
 module.exports = router
