@@ -22,10 +22,9 @@ const group = require('./routes/group')
 const User = require('./models/users')
 const Chats = require('./models/chats')
 const Group = require('./models/groups')
-const GroupUsers = require('./models/group_users')
+const GroupUsers = require('./models/group_users');
 
-
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -42,11 +41,10 @@ app.use('/', login)
 app.use('/', homePage)
 app.use('/', group)
 
-
 sequelize
     .sync()
     .then(result => {
         console.log('database connected')
-        app.listen(process.env.PORT || 4000)
+        app.listen(process.env.PORT || 5000)
     })
     .catch(err => console.log(err))

@@ -6,33 +6,61 @@ $(document).ready(function () {
   });
 });
 
+const socket = io('http://localhost:3000')
+
+socket.on('connect', () => {
+  console.log('connected')
+  // alert('you are connected')
+})
+
+// socket.on('receive-message', obj => {
+//   console.log(obj)
+//   showMessages(obj)
+// })
+
+
 window.addEventListener('DOMContentLoaded', async () => {
   getAllGroups()
 })
 
-// function continueFetching() {
-//   setInterval(() => {
-//     getAllMessages()
-//   }, 1000)
+// async function getAllUsers() {
+//   try {
+//     // const users = await axios.get('http://localhost:5000/getAllUsers', token)
+//     // const usernames = users.data.usernames
+//     // //   console.log(users.data.names)
+//     // for (let i = 0; i < usernames.length; i++) {
+//     //   showUsers(usernames[i])
+//     // }
+//     // const searchUser = await axios.get
+//   } catch (err) {
+//     console.log(err)
+//   }
 // }
+
+function continueFetching() {
+  setInterval(() => {
+    getAllMessages()
+  }, 1000)
+}
 
 async function sendMessage(e) {
   e.preventDefault()
   const message = document.getElementById('messageInput').value
   const DATE = new Date()
   const date = DATE.toString().slice(4, 21)
-  const name = localStorage.getItem('name')
+  const username = localStorage.getItem('username')
   const groupId = document.getElementById('sendMessageButton').dataset.groupId
-
-  const obj = {
-    // name,
+console.log(username)
+  const messageObj = {
+    username,
     message,
     date,
     isOwnMessage: true,
     groupId
   }
   showMessages(obj)
-  const messageSend = await axios.post('http://localhost:3000/messages', obj, token)
+  const messageSend = await axios.post('http://localhost:5000/messages', obj, token)
+  console.log(messageSend)
   document.getElementById('messageInput').value = ''
   const c = document.getElementById('messageInput')
   console.log(c)
@@ -45,7 +73,8 @@ async function createGroup(e) {
       groupName: e.target.groupName.value,
       username: localStorage.getItem('username')
     }
-    const createGroup = await axios.post('http://localhost:3000/createGroup', obj, token)
+    // console.log(obj, "[[[[")
+    const createGroup = await axios.post('http://localhost:5000/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -54,8 +83,10 @@ async function createGroup(e) {
 
 async function getAllGroups() {
   try {
+
     const username = localStorage.getItem('username');
-    const allGroups = await axios.get(`http://localhost:3000/getAllGroups/${username}`, token)
+    const allGroups = await axios.get(`http://localhost:5000/getAllGroups/${username}`, token)
+    // console.log(allGroups)
     const groups = allGroups.data.groups
 
     for (let i = 0; i < groups.length; i++) {
@@ -83,6 +114,7 @@ async function showGroups(group) {
   GroupButton.classList.add('openGroupButton');
   GroupButton.id = group.id
 
+  groupInfo.appendChild(groupName);
   groupInfo.appendChild(GroupButton);
 
   groupDiv.appendChild(groupInfo);
@@ -99,8 +131,15 @@ async function showGroups(group) {
 
 async function loadMessageSection(group) {
   try {
+    socket.on('receive-message', messageObj => {
+      // console.log('receive message')
+      // console.log(obj)
+      showMessages(messageObj)
+    })
     const admins = group.admin.split(',')
-    const adminSet = new Set(admins)
+    console.log(admins)
+    const admin = new Set(admins)
+    console.log(admin)
     const username = localStorage.getItem('username')
 
     document.getElementById('parentMessageContainer').innerHTML = ''
@@ -181,7 +220,8 @@ async function loadMessageSection(group) {
 async function getAllMessages(id, groupId) {
   try {
 
-    const messages = await axios.get(`http://localhost:3000/getAllMessages/${id}/${groupId}`, token)
+    const messages = await axios.get(`http://localhost:5000/getAllMessages/${id}/${groupId}`, token)
+    // console.log(messages)
 
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
@@ -230,6 +270,7 @@ async function getAllMessages(id, groupId) {
 }
 
 function showMessages(message) {
+  // console.log(message)
   const parentMessageContainer = document.getElementById('parentMessageContainer');
 
   const outerDiv = document.createElement('div');
@@ -238,7 +279,7 @@ function showMessages(message) {
   const messageContent = document.createElement('div');
   const time = document.createElement('span')
   const name = document.createElement('span')
-  if (message.isOwnMessage === true) {
+  if (message.username == username) {
     messageContent.classList.add('msg_container_own');
     time.classList.add('own_message_time')
     message.name = ''
@@ -310,7 +351,8 @@ function showSearchBar() {
 
 async function handleSearchUser(user) {
   try {
-    const userResult = await axios.get(`http://localhost:3000/searchUser/${user}`, token)
+    const userResult = await axios.get(`http://localhost:5000/searchUser/${user}`, token)
+    // console.log("userExist",userResult)
     const username = userResult.data.user
     const userFoundSection = document.getElementById('userList')
     userFoundSection.style.display = 'block';
@@ -328,8 +370,8 @@ async function handleSearchUser(user) {
     cancelButton.textContent = 'X';
 
     usernameLi.textContent = `${username}`
-    btnDiv.appendChild(addToGroupButton)
-    btnDiv.appendChild(cancelButton)
+    usernameLi.appendChild(addToGroupButton)
+    usernameLi.appendChild(cancelButton)
 
     usernameLi.appendChild(btnDiv)
     searchSection.appendChild(usernameLi)
@@ -351,7 +393,9 @@ async function addToGroup(username) {
   try {
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
-    const addUserToGroup = await axios.post(`http://localhost:3000/addUserToGroup/${groupId}`, { username }, token)
+    // console.log(groupId)
+    const addUserToGroup = await axios.post(`http://localhost:5000/addUserToGroup/${groupId}`, { username }, token)
+    // console.log(addUserToGroup)
     alert(`${username} added to group`)
   } catch (err) {
     if (err.response.status === 305) {
@@ -362,11 +406,11 @@ async function addToGroup(username) {
 
 async function showMembersList(group) {
   try {
-    const groupId = group.id;
-    const admins = new Set(group.admin.split(','))
-    const usernameLS = localStorage.getItem('username')
-    const groupMembers = await axios.get(`http://localhost:3000/getGroupMemebersList/${groupId}`, token)
+    
+    const groupMembers = await axios.get(`http://localhost:5000/getGroupMemebersList/${groupId}`, token)
+
     const users = groupMembers.data;
+    console.log(users)
     const modalBody = document.getElementById('groupMembersModalBody')
     modalBody.innerHTML = '';
 
@@ -385,57 +429,37 @@ async function showMembersList(group) {
         adminTag.classList.add('admin')
         listItem.textContent = username;
         adminTag.textContent = 'Admin'
+        adminTag.style.backgroundColor = 'grey'
         listItem.appendChild(adminTag)
       }
-      function makeMemberTag(x) {
+      function makeMemberTag() {
+        const makeAdminButton = document.createElement('button')
+        const removeMemberButton = document.createElement('button')
+        makeAdminButton.classList.add('make-admin-btn')
+        removeMemberButton.classList.add('remove-member-Button')
+        makeAdminButton.dataset.groupId = groupId;
+        removeMemberButton.dataset.groupId = groupId;
+
         listItem.textContent = username;
-        if(admins.has(usernameLS)){
+        makeAdminButton.textContent = 'Make Admin';
+        removeMemberButton.textContent = 'Remove'
+        listItem.appendChild(makeAdminButton)
+        listItem.appendChild(removeMemberButton)
 
-          makeButtons()
-        }
-         function makeButtons(){
-          const ButtonDiv = document.createElement('div');
+        removeMemberButton.addEventListener('click', () => {
+          removeMember(groupId, username, removeMemberTag)
+        })
 
-          const makeAdminButton = document.createElement('button')
-          const removeMemberButton = document.createElement('button')
-          makeAdminButton.classList.add('make-admin-btn')
-          removeMemberButton.classList.add('remove-member-Button')
-          makeAdminButton.dataset.groupId = groupId;
-          removeMemberButton.dataset.groupId = groupId;
-  
-          makeAdminButton.textContent = 'Make Admin';
-          removeMemberButton.textContent = 'Remove';
-          ButtonDiv.appendChild(makeAdminButton)
-          ButtonDiv.appendChild(removeMemberButton)
-          listItem.appendChild(ButtonDiv)
-  
-          removeMemberButton.addEventListener('click', () => {
-            removeMember(groupId, username, removeMemberTag)
-          })
-  
-          makeAdminButton.addEventListener('click', () => {
-            makeAdmin(groupId, username, makeAdminTag)
-          })
-         }
-        
+        makeAdminButton.addEventListener('click', () => {
+          makeAdmin(groupId, username, makeAdminTag)
+        })
       }
-      if(admins.has(usernameLS)){
-        if (admin === true) {
-          makeAdminTag()
-        }
-        else {
-          makeMemberTag()
-        }
-      }else{
-        console.log(usernameLS ,"and", admins)
-        if (admin === true) {
-          console.log('checking')
-          makeAdminTag()
-        } 
-        else {
-          console.group('not a member')
-          makeMemberTag()
-        }
+
+
+      if (admin === true) {
+        makeAdminTag()
+      } else {
+        makeMemberTag()
       }
       userList.appendChild(listItem);
 
@@ -461,8 +485,15 @@ async function removeMember(groupId, username, removeMemberTag) {
 
 async function makeAdmin(groupId, username, makeAdminTag) {
   try {
-    const makeAdmin = await axios.put(`http://localhost:3000/makeMemberAdmin/${groupId}/${username}`, token)
-    if (makeAdmin.status === 200) {
+    console.log('make admin')
+    // console.log(groupId, username)
+    // let x = 1;
+    // if(x == 1){
+    //   makeAdminTag()
+    // }
+    const makeAdmin = await axios.put(`http://localhost:5000/makeMemberAdmin/${groupId}/${username}`, token)
+    console.log(makeAdmin)
+    if(makeAdmin.status === 200){
       makeAdminTag()
     }
   } catch (err) {
