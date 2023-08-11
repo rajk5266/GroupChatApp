@@ -379,3 +379,16 @@ margin-bottom: 15px !important;
 /* .groupLi{
     padding: 0 !important;
 } */
+.logoutButtonDiv{
+    display: flex;
+    justify-content: right;
+}
+#logoutButton{
+    background-color: #0c51aa;
+    width: 50%;
+    border: none;
+    outline: none;
+    margin: 5px;
+    border-radius: 8px;
+
+}
