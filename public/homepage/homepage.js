@@ -45,7 +45,6 @@ async function createGroup(e) {
       groupName: e.target.groupName.value,
       username: localStorage.getItem('username')
     }
-    console.log(obj, "[[[[")
     const createGroup = await axios.post('http://localhost:3000/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
