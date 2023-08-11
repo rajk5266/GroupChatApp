@@ -64,6 +64,9 @@
                                 <span id="groupName">Default Group</span>
                                 <!-- <p>1767 Messages</p> -->
                             </div>
+                            <div id="headerButtonsDiv">
+                                
+                            </div>
                         </div>
                         <div id="search-option">
                             
@@ -74,12 +77,17 @@
             
                     </div>
                     <div class="card-body msg_card_body" id="parentMessageContainer">
-
                     </div>
                     <div class="input_section">
+
+                        <input type="file" id="mediaInput" accept="image/*, audio/*, video/*" style="display: none;">
+                        <div id="fileSelectedMessage" style="display: none;">File Selected: <span id="fileName"></span></div>
+
+                        <button id="fileButton">Select File</button>
+
                         <form id="messageForm" onsubmit="sendMessage(event)">
                             <div class="input_container">
-                                <input type="text" id="messageInput" placeholder="Type your message..." required>
+                                <input type="text" id="messageInput" placeholder="Type your message...">
                                 <button type="submit" id="sendMessageButton">Send</button>
                             </div>
                         </form>
@@ -108,6 +116,7 @@
   </div>
   
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
         <script src="../homepage/homepage.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>

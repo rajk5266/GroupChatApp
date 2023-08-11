@@ -8,8 +8,9 @@ async function login(event) {
         const logindetails = await axios.post(`http://localhost:3000/login`, obj)
         if(logindetails.status === 200){
             localStorage.setItem('token', logindetails.data.token)
+            localStorage.setItem('username', obj.username)
 
-            window.location.href = 'http://localhost:5000/homePage'
+            window.location.href = 'http://localhost:3000/homePage'
         }else{
             console.log('failed to login')
         }
