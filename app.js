@@ -1,10 +1,4 @@
 require('dotenv').config();
-const io = require('socket.io')(4000)
-console.log('---------------------------')
-io.on('connection', socket => {
-    console.log('socket ID', socket.id)
-})
-
 const express = require('express')
 const path = require('path');
 const bodyParser = require('body-parser')
@@ -12,12 +6,7 @@ const sequelize = require('./util/database')
 const cors = require('cors')
 const app = express();
 const http = require('http');
-// const server = http.createServer(app)
 
-
-// const emitEvent = (eventName, data) => {
-//     io.emit(eventName, data)
-// }
 app.use(cors())
 
 const signup = require('./routes/signup')
@@ -47,51 +36,32 @@ app.use('/', login)
 app.use('/', homePage)
 app.use('/', group)
 
-
 const server = app.listen(process.env.PORT || 3000, () => {
     console.log(`server is running on port 3000`)
 })
 const io = require('socket.io')(server)
+
 sequelize
     .sync()
     .then(result => {
         console.log('database connected')
-<<<<<<< HEAD
-        //     io.on('connection', socket => {
-        //         console.log('A user Connected');
-        //         console.log(socket.id)
-        //     socket.on('send-message', (messageObj) => {
-        //         socket.broadcast.emit('receive-message', messageObj);
-        //         // console.log("-----", messageObj);
-        //     });
-        //     socket.on('send-media', (obj) => {
-        //         socket.broadcast.emit('receive-media', obj)
-        //         // console.log("niik", obj)
-        //     })
-        //     socket.on('disconnect', () => {
-        //         console.log('user disconnected')
-        //     })
-        // })
-=======
-        app.listen(process.env.PORT || 4000)
->>>>>>> render
     })
     .catch(err => console.log(err))
 
-io.on('connection', socket => {
-    console.log('A user Connected');
-    console.log(socket.id)
-
-    socket.on('send-message', (messageObj) => {
-        socket.broadcast.emit('receive-message', messageObj);
-        // console.log("-----", messageObj);
-    });
-
-    socket.on('send-media', (obj) => {
-        socket.broadcast.emit('receive-media', obj)
-        // console.log("niik", obj)
+    io.on('connection', socket => {
+        console.log('A user Connected');
+        console.log(socket.id)
+    
+        socket.on('send-message', (messageObj) => {
+            socket.broadcast.emit('receive-message', messageObj);
+            // console.log("-----", messageObj);
+        });
+    
+        socket.on('send-media', (obj) => {
+            socket.broadcast.emit('receive-media', obj)
+            // console.log("niik", obj)
+        })
+        socket.on('disconnect', () => {
+            console.log('user disconnected')
+        })
     })
-    socket.on('disconnect', () => {
-        console.log('user disconnected')
-    })
-})
