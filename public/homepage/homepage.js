@@ -154,7 +154,6 @@ async function loadMessageSection(group) {
         showMembers.dataset.groupId = group.id
 
         groupHeader.appendChild(showMembers)
-
         showMembers.addEventListener('click', () => {
           const groupId = document.querySelector('.showMembers').dataset.groupId
           //  console.log(groupId)
