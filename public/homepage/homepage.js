@@ -459,7 +459,6 @@ async function removeMember(groupId, username, removeMemberTag) {
   } catch (err) {
     console.log(err)
   }
-
 }
 
 async function makeAdmin(groupId, username, makeAdminTag) {

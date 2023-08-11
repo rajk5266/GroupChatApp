@@ -6,7 +6,6 @@ async function signup(event) {
             email: event.target.email.value,
             password: event.target.password.value
         }
-        // localStorage.setItem('username', event.target.username.value)
         const response = await axios.post('http://localhost:3000/signup', signupdetails)
         console.log(response)
         if (response.status === 200) {

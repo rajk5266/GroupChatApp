@@ -17,6 +17,7 @@ exports.getAllUsers = async (req, res) => {
     }
 }
 
+
 exports.getAllMessages = async (req, res) => {
     try{
         // console.log(req.params)

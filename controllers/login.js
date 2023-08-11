@@ -11,6 +11,7 @@ exports.loginpage = (req, res) => {
 function generateToken (Id){
     return jwt.sign({userId: Id}, token)
 }
+
 exports.loginDetails =  async (req, res) => {
     const { username, password } = req.body;
     try {
