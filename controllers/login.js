@@ -8,14 +8,14 @@ exports.loginpage = (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'login', 'login.html'))
 }
 
-
 function generateToken (Id){
     return jwt.sign({userId: Id}, token)
 }
+
 exports.loginDetails =  async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
     try {
-      const user = await Users.findOne({ where: { email } });
+      const user = await Users.findOne({ where: { username } });
       if (!user) {
         return res.status(404).json({ success: false, message: "User not found" });
       } else {

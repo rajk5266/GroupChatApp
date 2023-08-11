@@ -16,70 +16,34 @@ window.addEventListener('DOMContentLoaded', async () => {
   getAllGroups()
 })
 
-const fileButton = document.getElementById('fileButton');
-const mediaInput = document.getElementById('mediaInput');
-const messageInput = document.getElementById('messageInput');
-const fileSelectedMessage = document.getElementById('fileSelectedMessage');
-const fileNameElement = document.getElementById('fileName');
+// async function getAllUsers() {
+//   try {
+//     // const users = await axios.get('http://localhost:5000/getAllUsers', token)
+//     // const usernames = users.data.usernames
+//     // //   console.log(users.data.names)
+//     // for (let i = 0; i < usernames.length; i++) {
+//     //   showUsers(usernames[i])
+//     // }
+//     // const searchUser = await axios.get
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
 
-fileButton.addEventListener('click', () => {
-  mediaInput.click();
-  fileSelectedMessage.style.display = 'none';
-  // console.log(mediaInput.files)
-});
+function continueFetching() {
+  setInterval(() => {
+    getAllMessages()
+  }, 1000)
+}
 
-mediaInput.addEventListener('change', () => {
-  const selectedFile = mediaInput.files[0];
-  // messageInput.disabled = true;
-  if (selectedFile) {
-    fileSelectedMessage.style.display = 'block';
-    fileNameElement.textContent = selectedFile.name;
-  } else {
-    fileSelectedMessage.style.display = 'none';
-  }
-});
+async function sendMessage(e) {
+  e.preventDefault()
 
-const sendMessage = async (event) => {
-  event.preventDefault();
-
-  const message = messageInput.value;
-  const selectedFile = mediaInput.files[0];
-  const username = localStorage.getItem('username');
-  const DATE = new Date();
-  const date = DATE.toString().slice(4, 21);
-  const groupId = document.getElementById('sendMessageButton').dataset.groupId;
-  // console.log(selectedFile.name)
-
-  if (selectedFile) {
-    console.log('selected media');
-    // messageInput.disabled = true;
-
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(selectedFile)
-
-    fileReader.onload = async function () {
-      const base64String = fileReader.result.split(',')[1];
-      const payload = {
-        username,
-        media: base64String,
-        type: 'image',
-        date,
-        isOwnMessage: true,
-        groupId
-      }
-      // console.log(payload)
-      const response = await axios.post('http://chatprivate.onrender.com/sendMediaFile', payload, token);
-      // console.log(response)
-      socket.emit('send-media', payload)
-      // messageInput.disabled = false
-      showMessages(payload)
-    }
-    const imageElement = document.createElement('img')
-    imageElement.src = ``;
-    document.body.appendChild(imageElement)
-    mediaInput.value = '';
-    fileNameElement.innerHTML = ''
-  } else if (message) {
+  const message = document.getElementById('messageInput').value
+  const DATE = new Date()
+  const date = DATE.toString().slice(4, 21)
+  const name = localStorage.getItem('name')
+  const groupId = document.getElementById('sendMessageButton').dataset.groupId
 
     // console.log(obj)
     console.log(message)
@@ -97,32 +61,11 @@ const sendMessage = async (event) => {
     const messageSend = await axios.post('http://chatprivate.onrender.com/messages', messageObj, token)
     messageInput.value = ''; 
   }
-};
-
-
-// async function sendMessage(e) {
-//   e.preventDefault()
-
-//   const message = document.getElementById('messageInput').value
-//   const DATE = new Date()
-//   const date = DATE.toString().slice(4, 21)
-//   const username = localStorage.getItem('username')
-//   const groupId = document.getElementById('sendMessageButton').dataset.groupId
-// console.log(username)
-//   const messageObj = {
-//     username,
-//     message,
-//     date,
-//     isOwnMessage: true,
-//     groupId
-//   }
-//   console.log(messageObj)
-//   showMessages(messageObj)
-//   socket.emit('send-message', messageObj)
-//   const messageSend = await axios.post('http://chatprivate.onrender.com/messages', messageObj, token)
-//   // console.log(messageSend)
-//   document.getElementById('messageInput').value = ''
-// }
+  showMessages(obj)
+  const messageSend = await axios.post('http://localhost:5000/messages', obj, token)
+  console.log(messageSend)
+  document.getElementById('messageInput').value = ''
+}
 
 async function createGroup(e) {
   try {
@@ -131,8 +74,8 @@ async function createGroup(e) {
       groupName: e.target.groupName.value,
       username: localStorage.getItem('username')
     }
-    console.log(obj, "[[[[")
-    const createGroup = await axios.post('http://chatprivate.onrender.com/createGroup', obj, token)
+    // console.log(obj, "[[[[")
+    const createGroup = await axios.post('http://localhost:5000/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -143,7 +86,7 @@ async function getAllGroups() {
   try {
 
     const username = localStorage.getItem('username');
-    const allGroups = await axios.get(`http://chatprivate.onrender.com/getAllGroups/${username}`, token)
+    const allGroups = await axios.get(`http://localhost:5000/getAllGroups/${username}`, token)
     // console.log(allGroups)
     const groups = allGroups.data.groups
 
@@ -164,13 +107,6 @@ async function showGroups(group) {
   const groupDiv = document.createElement('div');
   groupDiv.classList.add('d-flex', 'bd-highlight');
 
-  // const imgContainer = document.createElement('div');
-  // imgContainer.classList.add('img_cont');
-
-  // const userImg = document.createElement('img');
-  // userImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQceWscr6c86ViMmGsFmkCx9aSslCiIx83Z3Q&usqp=CAU';
-  // userImg.classList.add('rounded-circle', 'user_img');
-
   const groupInfo = document.createElement('div');
   groupInfo.classList.add('user_info');
 
@@ -179,7 +115,7 @@ async function showGroups(group) {
   GroupButton.classList.add('openGroupButton');
   GroupButton.id = group.id
 
-  // groupInfo.appendChild(groupName);
+  groupInfo.appendChild(groupName);
   groupInfo.appendChild(GroupButton);
 
   groupDiv.appendChild(groupInfo);
@@ -206,7 +142,9 @@ async function loadMessageSection(group) {
       showMessages(mediaObj)
     })
     const admins = group.admin.split(',')
+    console.log(admins)
     const admin = new Set(admins)
+    console.log(admin)
     const username = localStorage.getItem('username')
 
     document.getElementById('parentMessageContainer').innerHTML = ''
@@ -216,7 +154,7 @@ async function loadMessageSection(group) {
     groupName.textContent = group.groupname;
 
     const chatSection = document.getElementById('chatSection');
-    if (admin.has(username)) {
+    if (adminSet.has(username)) {
       const adddmemberbtn = document.querySelector('.addMemberButton')
       const showMembers = document.querySelector('.showMembers')
       if (adddmemberbtn || showMembers) {
@@ -238,15 +176,31 @@ async function loadMessageSection(group) {
         groupHeader.appendChild(showMembers)
 
         adddmemberbtn.addEventListener('click', () => {
-          // if (!searchContainerExist) {
           showSearchBar()
-          // }
         });
 
         showMembers.addEventListener('click', () => {
           const groupId = document.querySelector('.showMembers').dataset.groupId
+          showMembersList(group)
+        })
+      }
+    }
+    else{
+      const showMembers = document.querySelector('.showMembers')
+      if (showMembers) {
+        showMembers.dataset.groupId = group.id;
+      } else {
+        const showMembers = document.createElement('button');
+
+        showMembers.textContent = 'view Members';
+        showMembers.classList = 'showMembers'
+        showMembers.dataset.groupId = group.id
+
+        groupHeader.appendChild(showMembers)
+        showMembers.addEventListener('click', () => {
+          const groupId = document.querySelector('.showMembers').dataset.groupId
           //  console.log(groupId)
-          showMembersList(groupId)
+          showMembersList(group)
         })
       }
     }
@@ -271,7 +225,7 @@ async function loadMessageSection(group) {
 async function getAllMessages(id, groupId) {
   try {
 
-    const messages = await axios.get(`http://chatprivate.onrender.com/getAllMessages/${id}/${groupId}`, token)
+    const messages = await axios.get(`http://localhost:5000/getAllMessages/${id}/${groupId}`, token)
     // console.log(messages)
 
     const newMessages = messages.data.usersMessages;
@@ -322,7 +276,6 @@ async function getAllMessages(id, groupId) {
 
 function showMessages(message) {
   // console.log(message)
-  const username = localStorage.getItem('username')
   const parentMessageContainer = document.getElementById('parentMessageContainer');
 
   const outerDiv = document.createElement('div');
@@ -422,13 +375,7 @@ function showSearchBar() {
     searchSection.innerHTML = '';
     searchContainerExist = false
   }
-
-  // const searchSection = document.getElementById('search-option')
-  // const userList = document.getElementById('userList')
-  // userList.appendChild(searchBarContainer)
-  // userList.appendChild(removeButton)
   searchSection.appendChild(searchBarContainer)
-  // searchSection.appendChild(removeButton)
 
   searchContainerExist = true;
 
@@ -436,7 +383,6 @@ function showSearchBar() {
     const inputValue = searchInput.value
     handleSearchUser(inputValue)
   }
-
   const modalBody = document.getElementById('groupMembersModalBody')
   modalBody.innerHTML = '';
   modalBody.appendChild(searchSection);
@@ -447,10 +393,9 @@ function showSearchBar() {
 
 async function handleSearchUser(user) {
   try {
-    const userResult = await axios.get(`http://chatprivate.onrender.com/searchUser/${user}`, token)
+    const userResult = await axios.get(`http://localhost:5000/searchUser/${user}`, token)
     // console.log("userExist",userResult)
     const username = userResult.data.user
-    // console.log(username)
     const userFoundSection = document.getElementById('userList')
     userFoundSection.style.display = 'block';
 
@@ -467,12 +412,10 @@ async function handleSearchUser(user) {
     cancelButton.textContent = 'X';
 
     usernameLi.textContent = `${username}`
-
-    btnDiv.appendChild(addToGroupButton)
-    btnDiv.appendChild(cancelButton)
+    usernameLi.appendChild(addToGroupButton)
+    usernameLi.appendChild(cancelButton)
 
     usernameLi.appendChild(btnDiv)
-
     searchSection.appendChild(usernameLi)
 
     addToGroupButton.onclick = () => {
@@ -481,25 +424,19 @@ async function handleSearchUser(user) {
     }
     cancelButton.onclick = () => {
       usernameLi.remove();
-
-      // userFoundSection.removeAttribute('style')
     }
-
-
   } catch (err) {
     console.log('err', err.response.data)
-
     alert(err.response.data.message)
   }
 }
 
 async function addToGroup(username) {
   try {
-    // console.log("usserto addd",username)
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
     // console.log(groupId)
-    const addUserToGroup = await axios.post(`http://chatprivate.onrender.com/addUserToGroup/${groupId}`, { username }, token)
+    const addUserToGroup = await axios.post(`http://localhost:5000/addUserToGroup/${groupId}`, { username }, token)
     // console.log(addUserToGroup)
     alert(`${username} added to group`)
   } catch (err) {
@@ -509,13 +446,13 @@ async function addToGroup(username) {
   }
 }
 
-async function showMembersList(groupId) {
+async function showMembersList(group) {
   try {
-
-    const groupMembers = await axios.get(`http://chatprivate.onrender.com/getGroupMemebersList/${groupId}`, token)
+    
+    const groupMembers = await axios.get(`http://localhost:5000/getGroupMemebersList/${groupId}`, token)
 
     const users = groupMembers.data;
-    // console.log(users)
+    console.log(users)
     const modalBody = document.getElementById('groupMembersModalBody')
     modalBody.innerHTML = '';
 
@@ -529,19 +466,15 @@ async function showMembersList(groupId) {
       const listItem = document.createElement('li');
       listItem.classList.add('list-group-item');
 
-      function makeAdminTag() {
-        // listItem.innerHTML = ''
+      function makeAdminTag(x) {
         const adminTag = document.createElement('span')
         adminTag.classList.add('admin')
         listItem.textContent = username;
         adminTag.textContent = 'Admin'
-        // adminTag.style.backgroundColor = 'grey'
+        adminTag.style.backgroundColor = 'grey'
         listItem.appendChild(adminTag)
       }
-
       function makeMemberTag() {
-        const ButtonDiv = document.createElement('div');
-
         const makeAdminButton = document.createElement('button')
         const removeMemberButton = document.createElement('button')
         makeAdminButton.classList.add('make-admin-btn')
@@ -551,19 +484,19 @@ async function showMembersList(groupId) {
 
         listItem.textContent = username;
         makeAdminButton.textContent = 'Make Admin';
-        removeMemberButton.textContent = 'Remove';
-        ButtonDiv.appendChild(makeAdminButton)
-        ButtonDiv.appendChild(removeMemberButton)
-        // listItem.appendChild(makeAdminButton)
-        listItem.appendChild(ButtonDiv)
+        removeMemberButton.textContent = 'Remove'
+        listItem.appendChild(makeAdminButton)
+        listItem.appendChild(removeMemberButton)
 
         removeMemberButton.addEventListener('click', () => {
           removeMember(groupId, username, removeMemberTag)
         })
+
         makeAdminButton.addEventListener('click', () => {
           makeAdmin(groupId, username, makeAdminTag)
         })
       }
+
 
       if (admin === true) {
         makeAdminTag()
@@ -585,27 +518,36 @@ async function showMembersList(groupId) {
 
 async function removeMember(groupId, username, removeMemberTag) {
   try {
-    const removeMember = await axios.delete(`http://chatprivate.onrender.com/removeMember/${groupId}/${username}`, token)
+    const removeMember = await axios.delete(`http://localhost:5000/removeMember/${groupId}/${username}`, token)
     removeMemberTag()
   } catch (err) {
     console.log(err)
   }
-
 }
 
 async function makeAdmin(groupId, username, makeAdminTag) {
   try {
     console.log('make admin')
-    const makeAdmin = await axios.put(`http://chatprivate.onrender.com/makeMemberAdmin/${groupId}/${username}`, token)
+    // console.log(groupId, username)
+    // let x = 1;
+    // if(x == 1){
+    //   makeAdminTag()
+    // }
+    const makeAdmin = await axios.put(`http://localhost:5000/makeMemberAdmin/${groupId}/${username}`, token)
     console.log(makeAdmin)
-    if (makeAdmin.status === 200) {
+    if(makeAdmin.status === 200){
       makeAdminTag()
     }
-
   } catch (err) {
     console.log(err)
   }
 }
+
+const logoutButton = document.getElementById('logoutButton')
+logoutButton.addEventListener('click', () => {
+  localStorage.clear();
+  window.location.href = '/'
+})
 
 
 

@@ -42,6 +42,7 @@ exports.getAllUsers = async (req, res) => {
     }
 }
 
+
 exports.getAllMessages = async (req, res) => {
     try {
         // console.log(req.params)
@@ -86,6 +87,7 @@ exports.getAllMessages = async (req, res) => {
     }
 }
 
+<<<<<<< HEAD
 function uploadToS3(decodedBuffer, filename) {
     const BUCKET_NAME = process.env.S3BUCKET_NAME;
     const IAM_USER_KEY = process.env.IAM_USER_KEY;
@@ -129,6 +131,18 @@ exports.saveMediaFile = async (req, res) => {
         const filename = `Img-${req.user}/${new Date()}.txt`;
         const fileURL = await uploadToS3(decodedBuffer, filename);
 
+=======
+exports.saveMessages = async (req, res) => {
+    try{
+        // console.log('req.user',req.user)
+        // console.log(req.body)
+        // const message = req.body.message;
+        // const date = req.body.date;
+        // const isOwnMessage = req.body.isOwnMessage;
+        // const groupId = req.body.groupId
+        const {message,date,groupId} = req.body
+        console.log(message,"---",date,)
+>>>>>>> render
         const userName = await Users.findOne({
             where: {
                 id: req.user

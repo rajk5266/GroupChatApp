@@ -343,6 +343,10 @@ margin-bottom: 15px !important;
     display: flex !important;
     justify-content: space-between;
     padding: 6px 0;
+<<<<<<< HEAD
+=======
+
+>>>>>>> render
 } */
 .searchedUser{
     width: 100%;
@@ -375,8 +379,26 @@ margin-bottom: 15px !important;
     padding: 6px;
     margin: 4px;
 }
+<<<<<<< HEAD
 
 .chat-image{
     width: 200px;
     height: 200px;
+=======
+/* .groupLi{
+    padding: 0 !important;
+} */
+.logoutButtonDiv{
+    display: flex;
+    justify-content: right;
+}
+#logoutButton{
+    background-color: #0c51aa;
+    width: 50%;
+    border: none;
+    outline: none;
+    margin: 5px;
+    border-radius: 8px;
+
+>>>>>>> render
 }

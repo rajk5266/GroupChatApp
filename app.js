@@ -1,4 +1,10 @@
 require('dotenv').config();
+const io = require('socket.io')(4000)
+console.log('---------------------------')
+io.on('connection', socket => {
+    console.log('socket ID', socket.id)
+})
+
 const express = require('express')
 const path = require('path');
 const bodyParser = require('body-parser')
@@ -30,10 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 User.hasMany(Chats)
 Chats.belongsTo(User)
-
 Chats.belongsTo(Group)
-
-// User.hasMany(GroupUsers)
 Group.hasMany(Chats)
 Group.hasMany(GroupUsers)
 
@@ -53,6 +56,7 @@ sequelize
     .sync()
     .then(result => {
         console.log('database connected')
+<<<<<<< HEAD
         //     io.on('connection', socket => {
         //         console.log('A user Connected');
         //         console.log(socket.id)
@@ -68,6 +72,9 @@ sequelize
         //         console.log('user disconnected')
         //     })
         // })
+=======
+        app.listen(process.env.PORT || 4000)
+>>>>>>> render
     })
     .catch(err => console.log(err))
 
