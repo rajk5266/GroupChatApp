@@ -8,15 +8,15 @@ exports.homePage = (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'homepage', 'homepage.html'))
 }
 
-// exports.getAllUsers = async (req, res) => {
-//     try{
-//           const users = await Users.findAll()
-//           const usernames = users.map(user => user.dataValues.username);
-//         res.status(200).json({usernames})
-//     }catch(err){
-//         console.log(err)
-//     }
-// }
+exports.getAllUsers = async (req, res) => {
+    try{
+          const users = await Users.findAll()
+          const usernames = users.map(user => user.dataValues.username);
+        res.status(200).json({usernames})
+    }catch(err){
+        console.log(err)
+    }
+}
 
 
 exports.getAllMessages = async (req, res) => {
