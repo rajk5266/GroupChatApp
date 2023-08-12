@@ -6,7 +6,7 @@ $(document).ready(function () {
   });
 });
 
-const socket = io('http://chatprivate.onrender.com:3000')
+const socket = io('https://chatprivate.onrender.com:3000')
 
 socket.on('connect', () => {
   // console.log('connected')
@@ -67,7 +67,7 @@ const sendMessage = async (event) => {
         groupId
       }
       // console.log(payload)
-      const response = await axios.post('http://chatprivate.onrender.com:3000/sendMediaFile', payload, token);
+      const response = await axios.post('https://chatprivate.onrender.com:3000/sendMediaFile', payload, token);
       // console.log(response)
       socket.emit('send-media', payload)
       // messageInput.disabled = false
@@ -93,7 +93,7 @@ const sendMessage = async (event) => {
 
     socket.emit('send-message', messageObj);
     showMessages(messageObj)
-    const messageSend = await axios.post('http://chatprivate.onrender.com:3000/messages', messageObj, token)
+    const messageSend = await axios.post('https://chatprivate.onrender.com:3000/messages', messageObj, token)
     messageInput.value = '';
   }
 };
@@ -106,7 +106,7 @@ async function createGroup(e) {
       username: localStorage.getItem('username')
     }
     // console.log(obj, "[[[[")
-    const createGroup = await axios.post('http://chatprivate.onrender.com:3000/createGroup', obj, token)
+    const createGroup = await axios.post('https://chatprivate.onrender.com:3000/createGroup', obj, token)
     showGroups(createGroup.data.groupDetails)
   } catch (err) {
     console.log(err)
@@ -117,7 +117,7 @@ async function getAllGroups() {
   try {
 
     const username = localStorage.getItem('username');
-    const allGroups = await axios.get(`http://chatprivate.onrender.com:3000/getAllGroups/${username}`, token)
+    const allGroups = await axios.get(`https://chatprivate.onrender.com:3000/getAllGroups/${username}`, token)
     // console.log(allGroups)
     const groups = allGroups.data.groups
 
@@ -257,7 +257,7 @@ async function loadMessageSection(group) {
 
 async function getAllMessages(id, groupId) {
   try {
-    const messages = await axios.get(`http://chatprivate.onrender.com:3000/getAllMessages/${id}/${groupId}`, token)
+    const messages = await axios.get(`https://chatprivate.onrender.com:3000/getAllMessages/${id}/${groupId}`, token)
 
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
@@ -313,7 +313,7 @@ function showMessages(message) {
   const name = document.createElement('span')
   const decodedMessage = decodeURIComponent(message.message)
 
-  if (decodedMessage.startsWith('https')) {
+  if (decodedMessage.startsWith('httpss')) {
     const imageElement = document.createElement('img');
     imageElement.src = message.message;
     imageElement.classList.add('chat-image');
@@ -418,7 +418,7 @@ function showSearchBar() {
 
 async function handleSearchUser(user) {
   try {
-    const userResult = await axios.get(`http://chatprivate.onrender.com:3000/searchUser/${user}`, token)
+    const userResult = await axios.get(`https://chatprivate.onrender.com:3000/searchUser/${user}`, token)
     // console.log("userExist",userResult)
     const username = userResult.data.user
     const userFoundSection = document.getElementById('userList')
@@ -461,7 +461,7 @@ async function addToGroup(username) {
   try {
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
-    const addUserToGroup = await axios.post(`http://chatprivate.onrender.com:3000/addUserToGroup/${groupId}`, { username }, token)
+    const addUserToGroup = await axios.post(`https://chatprivate.onrender.com:3000/addUserToGroup/${groupId}`, { username }, token)
     alert(`${username} added to group`)
   } catch (err) {
     if (err.response.status === 305) {
@@ -475,7 +475,7 @@ async function showMembersList(group) {
     const groupId = group.id;
     const admins = new Set(group.admin.split(','))
     const usernameLS = localStorage.getItem('username')
-    const groupMembers = await axios.get(`http://chatprivate.onrender.com:3000/getGroupMemebersList/${groupId}`, token)
+    const groupMembers = await axios.get(`https://chatprivate.onrender.com:3000/getGroupMemebersList/${groupId}`, token)
     const users = groupMembers.data;
     const modalBody = document.getElementById('groupMembersModalBody')
     modalBody.innerHTML = '';
@@ -554,7 +554,7 @@ async function showMembersList(group) {
 
 async function removeMember(groupId, username, removeMemberTag) {
   try {
-    const removeMember = await axios.delete(`http://chatprivate.onrender.com:3000/removeMember/${groupId}/${username}`, token)
+    const removeMember = await axios.delete(`https://chatprivate.onrender.com:3000/removeMember/${groupId}/${username}`, token)
     removeMemberTag()
   } catch (err) {
     console.log(err)
@@ -564,7 +564,7 @@ async function removeMember(groupId, username, removeMemberTag) {
 async function makeAdmin(groupId, username, makeAdminTag) {
   try {
     console.log('make admin')
-    const makeAdmin = await axios.put(`http://chatprivate.onrender.com:3000/makeMemberAdmin/${groupId}/${username}`, token)
+    const makeAdmin = await axios.put(`https://chatprivate.onrender.com:3000/makeMemberAdmin/${groupId}/${username}`, token)
     console.log(makeAdmin)
     if (makeAdmin.status === 200) {
       makeAdminTag()
