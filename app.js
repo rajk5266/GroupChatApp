@@ -18,6 +18,7 @@ const User = require('./models/users')
 const Chats = require('./models/chats')
 const Group = require('./models/groups')
 const GroupUsers = require('./models/group_users');
+const archivedChats = require('./models/archivedChats')
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -35,6 +36,9 @@ app.use('/', signup)
 app.use('/', login)
 app.use('/', homePage)
 app.use('/', group)
+
+const job = require('./jobs/cron');
+job.start();
 
 const server = app.listen(process.env.PORT || 3000, () => {
     console.log(`server is running on port 3000`)
