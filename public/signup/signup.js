@@ -6,11 +6,11 @@ async function signup(event) {
             email: event.target.email.value,
             password: event.target.password.value
         }
-        const response = await axios.post('http://localhost:3000/signup', signupdetails)
+        const response = await axios.post('http://chatprivate.onrender.com:3000/signup', signupdetails)
         console.log(response)
         if (response.status === 200) {
             alert('registered successfully')
-            window.location.href = "http://localhost:3000"
+            window.location.href = "http://chatprivate.onrender.com:3000"
         }
     } catch (err) {
     
