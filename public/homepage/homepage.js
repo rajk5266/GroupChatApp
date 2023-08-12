@@ -16,29 +16,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   getAllGroups()
 })
 
-// async function sendMessage(e) {
-//   e.preventDefault()
-//   const message = document.getElementById('messageInput').value
-//   const DATE = new Date()
-//   const date = DATE.toString().slice(4, 21)
-//   const username = localStorage.getItem('username')
-//   const groupId = document.getElementById('sendMessageButton').dataset.groupId
-// console.log(username)
-//   const messageObj = {
-//     username,
-//     message,
-//     date,
-//     isOwnMessage: true,
-//     groupId
-//   }
-//   showMessages(obj)
-//   const messageSend = await axios.post('http://localhost:3000/messages', obj, token)
-//   console.log(messageSend)
-//   document.getElementById('messageInput').value = ''
-//   const c = document.getElementById('messageInput')
-//   console.log(c)
-// }
-
 const fileButton = document.getElementById('fileButton');
 const mediaInput = document.getElementById('mediaInput');
 const messageInput = document.getElementById('messageInput');
@@ -48,7 +25,6 @@ const fileNameElement = document.getElementById('fileName');
 fileButton.addEventListener('click', () => {
   mediaInput.click();
   fileSelectedMessage.style.display = 'none';
-  // console.log(mediaInput.files)
 });
 
 mediaInput.addEventListener('change', () => {
@@ -118,7 +94,7 @@ const sendMessage = async (event) => {
     socket.emit('send-message', messageObj);
     showMessages(messageObj)
     const messageSend = await axios.post('http://localhost:3000/messages', messageObj, token)
-    messageInput.value = ''; 
+    messageInput.value = '';
   }
 };
 
@@ -186,9 +162,7 @@ async function showGroups(group) {
 }
 
 async function loadMessageSection(group) {
-  // document.getElementById('group_headbar').innerHTML = ''
   try {
-    // console.group(group)
     socket.on('receive-message', messageObj => {
       showMessages(messageObj)
     })
@@ -197,7 +171,6 @@ async function loadMessageSection(group) {
     })
     const admins = group.admin.split(',')
     const adminSet = new Set(admins)
-    // console.log(adminSet)
     const username = localStorage.getItem('username')
 
     document.getElementById('parentMessageContainer').innerHTML = ''
@@ -207,129 +180,74 @@ async function loadMessageSection(group) {
     groupName.textContent = group.groupname;
 
     const chatSection = document.getElementById('chatSection');
-    // let adddmemberbtn = document.querySelector('.addMemberButton')
-    // let showMembers = document.querySelector('.showMembers')
     const isAdmin = adminSet.has(username)
     const btnDiv = document.getElementById('headerButtonsDiv')
-    function userIsAdmin(){
-      console.log(isAdmin)
-      // console.log(btnDiv)
-      btnDiv.innerHTML = ''
-      // const addMemberButton = document.querySelectorAll('.addMemberButton')
-      if(!isAdmin){
+
+    function headbarButtons() {
+      btnDiv.innerHTML = '';
+
+      if (!isAdmin) {
         addViewMemberButton()
-      }if(isAdmin){
+      } if (isAdmin) {
         addMemberButton()
         addViewMemberButton()
       }
-     function addMemberButton(){
-      let adddmemberbtn = document.querySelector('.addMemberButton')
-      if (adddmemberbtn) {
-        adddmemberbtn.dataset.groupId = group.id;
+      function addMemberButton() {
+        let adddmemberbtn = document.querySelector('.addMemberButton')
+        if (adddmemberbtn) {
+          adddmemberbtn.dataset.groupId = group.id;
+        }
+        else {
+          const buttonDiv = document.getElementById('headerButtonsDiv')
+          const adddmemberbtn = document.createElement('button')
+          adddmemberbtn.textContent = 'Add Member'
+          adddmemberbtn.classList = 'addMemberButton'
+          adddmemberbtn.dataset.groupId = group.id
+
+          buttonDiv.appendChild(adddmemberbtn)
+          groupHeader.appendChild(buttonDiv)
+          adddmemberbtn.addEventListener('click', () => {
+            showSearchBar()
+          });
+        }
       }
-      else{
-        const buttonDiv = document.getElementById('headerButtonsDiv')
-        const adddmemberbtn = document.createElement('button')
-        adddmemberbtn.textContent = 'Add Member'
-        adddmemberbtn.classList = 'addMemberButton'
-        adddmemberbtn.dataset.groupId = group.id
+      function addViewMemberButton() {
+        let showMembers = document.querySelector('.showMembers')
+        if (showMembers) {
+          showMembers.dataset.groupId = group.id;
+        }
+        else {
+          const buttonDiv = document.getElementById('headerButtonsDiv')
+          const showMembers = document.createElement('button')
+          showMembers.textContent = 'view Members'
+          showMembers.classList = 'showMembers'
+          showMembers.dataset.groupId = group.id
 
-        buttonDiv.appendChild(adddmemberbtn)
-        groupHeader.appendChild(buttonDiv)
-        adddmemberbtn.addEventListener('click', () => {
-          showSearchBar()
-        });
+          buttonDiv.appendChild(showMembers)
+          groupHeader.appendChild(buttonDiv)
+          showMembers.addEventListener('click', () => {
+            showMembersList(group)
+          });
+        }
       }
-     }
-     function addViewMemberButton(){
-      let showMembers = document.querySelector('.showMembers')
-      if (showMembers) {
-        showMembers.dataset.groupId = group.id;
-      }
-      else{
-        const buttonDiv = document.getElementById('headerButtonsDiv')
-        const showMembers = document.createElement('button')
-        showMembers.textContent = 'view Members'
-        showMembers.classList = 'showMembers'
-        showMembers.dataset.groupId = group.id
-
-        buttonDiv.appendChild(showMembers)
-        groupHeader.appendChild(buttonDiv)
-        showMembers.addEventListener('click', () => {
-          showMembersList(group)
-        });
-      }
-     }
-      // if (adddmemberbtn || showMembers) {
-      //   // console.log('Button exist')
-      //   adddmemberbtn.dataset.groupId = group.id;
-      //   showMembers.dataset.groupId = group.id;
-      // }
-      //   {
-      //   // const adddmemberbtn = document.createElement('button')
-      //   // const showMembers = document.createElement('button');
-      //   // const buttonDiv = document.getElementById('headerButtonsDiv')
-      //   // adddmemberbtn.textContent = 'Add Member'
-      //   // adddmemberbtn.classList = 'addMemberButton'
-      //   // adddmemberbtn.dataset.groupId = group.id
-
-      //   // showMembers.textContent = 'view Members';
-      //   // showMembers.classList = 'showMembers'
-      //   // showMembers.dataset.groupId = group.id
-      //   // buttonDiv.appendChild(adddmemberbtn)
-      //   // buttonDiv.appendChild(showMembers)
-      //   // groupHeader.appendChild(buttonDiv)
-
-      //   // // groupHeader.appendChild(adddmemberbtn)
-      //   // // groupHeader.appendChild(showMembers)
-
-      //   // adddmemberbtn.addEventListener('click', () => {
-      //   //   showSearchBar()
-      //   // });
-
-      //   showMembers.addEventListener('click', () => {
-      //     // const groupId = document.querySelector('.showMembers').dataset.groupId
-      //     showMembersList(group)
-      //   })
-      // } 
     }
 
     if (adminSet.has(username)) {
       console.log(`${username} is admin`)
-        userIsAdmin(isAdmin)
+      headbarButtons()
     }
-    else{
-      userIsAdmin(isAdmin)
-      // const showMembers = document.querySelector('.showMembers')
-      // if (adddmemberbtn ||showMembers) {
-      //   adddmemberbtn.dataset.groupId = group.id;
-      //   showMembers.dataset.groupId = group.id;
-      // } else {
-      //   // console.log('making show members button')
-      //   const showMembers = document.createElement('button');
-      //   showMembers.textContent = 'view Members';
-      //   showMembers.classList = 'showMembers'
-      //   showMembers.dataset.groupId = group.id
-
-      //   groupHeader.appendChild(showMembers)
-      //   showMembers.addEventListener('click', () => {
-      //     const groupId = document.querySelector('.showMembers').dataset.groupId
-      //      console.log(groupId)
-      //     showMembersList(group)
-      //   })
-      // }
+    else {
+      headbarButtons()
     }
     chatSection.style.display = 'block';
 
     const storedMsg = localStorage.getItem(`${group.id}`)
     if (storedMsg === null) {
-      // console.log('null')
       await getAllMessages(undefined, group.id)
     }
     else {
       const parsedMsg = JSON.parse(storedMsg);
       const lastMessageId = parsedMsg[parsedMsg.length - 1].id
-      // console.log(lastMessageId)
       await getAllMessages(lastMessageId, group.id)
     }
   } catch (err) {
@@ -339,16 +257,13 @@ async function loadMessageSection(group) {
 
 async function getAllMessages(id, groupId) {
   try {
-
     const messages = await axios.get(`http://localhost:3000/getAllMessages/${id}/${groupId}`, token)
-    // console.log(messages)
 
     const newMessages = messages.data.usersMessages;
     const storedMessages = localStorage.getItem(`${groupId}`)
     if (storedMessages == null && newMessages.length == 0) {
       return
     }
-    // console.log(newMessages)
     if (!storedMessages) {
       if (newMessages.length < 10) {
         localStorage.setItem(`${groupId}`, JSON.stringify(newMessages))
@@ -357,7 +272,6 @@ async function getAllMessages(id, groupId) {
         }
       } else {
         let newmsg = newMessages.slice(newMessages.length - 10)
-        // console.log(newmsg)
         localStorage.setItem(`${groupId}`, JSON.stringify(newmsg))
         for (let i = 0; i < newmsg.length; i++) {
           showMessages(newmsg[i])
@@ -382,46 +296,10 @@ async function getAllMessages(id, groupId) {
         }
       }
     }
-
-    // continueFetching()
   } catch (err) {
     console.log(err)
   }
 }
-
-// function showMessages(message) {
-//   // console.log(message)
-//   const parentMessageContainer = document.getElementById('parentMessageContainer');
-
-//   const outerDiv = document.createElement('div');
-//   outerDiv.classList.add('d-flex', 'justify-content-start', 'mb-4');
-
-//   const messageContent = document.createElement('div');
-//   const time = document.createElement('span')
-//   const name = document.createElement('span')
-//   if (message.username == username) {
-//     messageContent.classList.add('msg_container_own');
-//     time.classList.add('own_message_time')
-//     message.name = ''
-//   }
-//   else {
-//     messageContent.classList.add('msg_container_others')
-//     time.classList.add('others_message_time');
-//     name.textContent = message.username
-//   }
-
-//   messageContent.textContent = message.message;
-//   time.textContent = message.date
-
-//   outerDiv.appendChild(messageContent);
-
-//   parentMessageContainer.appendChild(name)
-//   parentMessageContainer.appendChild(outerDiv);
-//   parentMessageContainer.appendChild(time)
-//   parentMessageContainer.appendChild(document.createElement('hr'))
-
-//   parentMessageContainer.scrollTop = parentMessageContainer.scrollHeight
-// }
 
 function showMessages(message) {
   // console.log(message)
@@ -583,9 +461,7 @@ async function addToGroup(username) {
   try {
     const Button = document.getElementById('sendMessageButton');
     const groupId = Button.dataset.groupId;
-    // console.log(groupId)
     const addUserToGroup = await axios.post(`http://localhost:3000/addUserToGroup/${groupId}`, { username }, token)
-    // console.log(addUserToGroup)
     alert(`${username} added to group`)
   } catch (err) {
     if (err.response.status === 305) {
@@ -593,72 +469,6 @@ async function addToGroup(username) {
     }
   }
 }
-
-// async function showMembersList(group) {
-//   try {
-
-//     const groupMembers = await axios.get(`http://localhost:3000/getGroupMemebersList/${groupId}`, token)
-
-//     const users = groupMembers.data;
-//     // console.log(users)
-//     const modalBody = document.getElementById('groupMembersModalBody')
-//     modalBody.innerHTML = '';
-//     const userList = document.createElement('ul');
-//     userList.classList.add('list-group');
-//     for (let i = 0; i < users.length; i++) {
-//       const admin = users[i].isAdmin;
-//       const username = users[i].username
-//       const listItem = document.createElement('li');
-//       listItem.classList.add('list-group-item');
-//       function makeAdminTag() {
-//         // listItem.innerHTML = ''
-//         const adminTag = document.createElement('span')
-//         adminTag.classList.add('admin')
-//         listItem.textContent = username;
-//         adminTag.textContent = 'Admin'
-//         // adminTag.style.backgroundColor = 'grey'
-//         listItem.appendChild(adminTag)
-//       }
-
-//       function makeMemberTag() {
-//         const ButtonDiv = document.createElement('div');
-
-//         const makeAdminButton = document.createElement('button')
-//         const removeMemberButton = document.createElement('button')
-//         makeAdminButton.classList.add('make-admin-btn')
-//         removeMemberButton.classList.add('remove-member-Button')
-//         makeAdminButton.dataset.groupId = groupId;
-//         removeMemberButton.dataset.groupId = groupId;
-//         listItem.textContent = username;
-//         makeAdminButton.textContent = 'Make Admin';
-//         removeMemberButton.textContent = 'Remove';
-//         ButtonDiv.appendChild(makeAdminButton)
-//         ButtonDiv.appendChild(removeMemberButton)
-//         // listItem.appendChild(makeAdminButton)
-//         listItem.appendChild(ButtonDiv)
-//         removeMemberButton.addEventListener('click', () => {
-//           removeMember(groupId, username, removeMemberTag)
-//         })
-//         makeAdminButton.addEventListener('click', () => {
-//           makeAdmin(groupId, username, makeAdminTag)
-//         })
-//       }
-//       if (admin === true) {
-//         makeAdminTag()
-//       } else {
-//         makeMemberTag()
-//       }
-//       userList.appendChild(listItem);
-//       const removeMemberTag = () => {
-//         listItem.innerHTML = `${username} - removed from group`
-//       }
-//     }
-//     modalBody.appendChild(userList);
-//     const groupMembersModal = new bootstrap.Modal(document.getElementById('groupMembersModal'));
-//     groupMembersModal.show();
-//   } catch (err) {
-//   }
-// }
 
 async function showMembersList(group) {
   try {
@@ -671,11 +481,13 @@ async function showMembersList(group) {
     modalBody.innerHTML = '';
     const userList = document.createElement('ul');
     userList.classList.add('list-group');
+
     for (let i = 0; i < users.length; i++) {
       const admin = users[i].isAdmin;
       const username = users[i].username
       const listItem = document.createElement('li');
       listItem.classList.add('list-group-item');
+
       function makeAdminTag(x) {
         const adminTag = document.createElement('span')
         adminTag.classList.add('admin')
@@ -683,12 +495,12 @@ async function showMembersList(group) {
         adminTag.textContent = 'Admin'
         listItem.appendChild(adminTag)
       }
-      function makeMemberTag(x) {
+      function makeNonAdminTag(x) {
         listItem.textContent = username;
-        if(admins.has(usernameLS)){
+        if (admins.has(usernameLS)) {
           makeButtons()
         }
-         function makeButtons(){
+        function makeButtons() {
           const ButtonDiv = document.createElement('div');
           const makeAdminButton = document.createElement('button')
           const removeMemberButton = document.createElement('button')
@@ -696,39 +508,36 @@ async function showMembersList(group) {
           removeMemberButton.classList.add('remove-member-Button')
           makeAdminButton.dataset.groupId = groupId;
           removeMemberButton.dataset.groupId = groupId;
-  
+
           makeAdminButton.textContent = 'Make Admin';
           removeMemberButton.textContent = 'Remove';
           ButtonDiv.appendChild(makeAdminButton)
           ButtonDiv.appendChild(removeMemberButton)
           listItem.appendChild(ButtonDiv)
-  
+
           removeMemberButton.addEventListener('click', () => {
             removeMember(groupId, username, removeMemberTag)
           })
-  
+
           makeAdminButton.addEventListener('click', () => {
             makeAdmin(groupId, username, makeAdminTag)
           })
-         }
-        
+        }
+
       }
-      if(admins.has(usernameLS)){
+      if (admins.has(usernameLS)) {
         if (admin === true) {
           makeAdminTag()
         }
         else {
-          makeMemberTag()
+          makeNonAdminTag()
         }
-      }else{
-        console.log(usernameLS ,"and", admins)
+      } else {
         if (admin === true) {
-          console.log('checking')
           makeAdminTag()
-        } 
+        }
         else {
-          console.group('not a member')
-          makeMemberTag()
+          makeNonAdminTag()
         }
       }
       userList.appendChild(listItem);

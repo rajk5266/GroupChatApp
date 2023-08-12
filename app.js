@@ -54,12 +54,10 @@ sequelize
     
         socket.on('send-message', (messageObj) => {
             socket.broadcast.emit('receive-message', messageObj);
-            // console.log("-----", messageObj);
         });
     
         socket.on('send-media', (obj) => {
             socket.broadcast.emit('receive-media', obj)
-            // console.log("niik", obj)
         })
         socket.on('disconnect', () => {
             console.log('user disconnected')

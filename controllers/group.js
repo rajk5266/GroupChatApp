@@ -150,9 +150,9 @@ exports.makeAdmin = async (req, res) => {
         })
         //  console.log(makeAdmin)
         const existingAdmins = group.admin.split(',')
-        console.log(existingAdmins)
+        // console.log(existingAdmins)
         existingAdmins.push(username)
-        console.log(existingAdmins)
+        // console.log(existingAdmins)
 
            const updateAdmins=  await Group.update(
                 { admin: existingAdmins.join(',') }, 
